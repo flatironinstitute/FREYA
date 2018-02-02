@@ -23,7 +23,7 @@ jupyter-repo2docker --no-run \
 
 The analysis requires source data which is not included
 in the repository to protect privacy and intellectual property.
-The required date must be mounted to the container or provided
+The required data must be mounted to the container or provided
 in some other way.
 
 To run the image with a mounted data directory located at
