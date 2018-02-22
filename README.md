@@ -24,15 +24,15 @@ jupyter-repo2docker --no-run \
 The analysis requires source data which is not included
 in the repository to protect privacy and intellectual property.
 The required data must be mounted to the container or provided
-in some other way.
+in some other way. We provide synthetic sample data in TODO.
 
 To run the image with a mounted data directory located at
-`/Users/awatters/misc/kiley_graim/kgraim/data`
+`/Path/to/your/data`
 invoke `docker run` with the directory mounted like so:
 
 ```bash
 docker run -it --rm -p 8888:8888 \
-   -v /Users/awatters/misc/kiley_graim/kgraim/data:/home/rstudio/work/data:z \
+   -v /Path/to/your/data:/home/rstudio/notebooks/data:z \
    canine_bc:latest
 ```
 
