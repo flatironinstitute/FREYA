@@ -94,6 +94,17 @@ $ kill -9 1510
 
 ## For developers: mounting the notebooks for persistence
 
+To build the docker image from a local directory including provisional changes
+that have not been checked in to the github repository use 
+`repo2docker` with the path to the directory
+instead of the github URL
+
+```bash
+jupyter-repo2docker --no-run \
+    --image-name canine_bc \
+    /Users/awatters/repos/canine_breast_cancer_public
+```
+
 Note that since the notebooks are not in the mounted directory in the `docker run` above
 any changes to the notebooks live within the container only and 
 will not persist after the image is discarded.
@@ -103,15 +114,15 @@ container similar to this:
 
 ```bash
 docker run -it --rm -p 8888:8888 \
-   -v /Users/awatters/repos/canine_breast_cancer_public/work:/home/rstudio/work:z \
-   -v /Users/awatters/misc/kiley_graim/kgraim/data:/home/rstudio/work/data:z \
+   -v /Users/awatters/repos/canine_breast_cancer_public/notebooks:/home/rstudio/notebooks:z \
+   -v /Users/awatters/misc/kiley_graim/kgraim/data:/home/rstudio/notebooks/data:z \
    canine_bc:latest
 ```
 
 The above command mounts the persistent directory containing scripts and notebooks
-`/Users/awatters/repos/canine_breast_cancer_public/work` into
+`/Users/awatters/repos/canine_breast_cancer_public/notebooks` into
 the container at the location
-`/home/rstudio/work`.  Changes made in the mounted directory will persist.
+`/home/rstudio/notebooks`.  Changes made in the mounted directory will persist.
 
 ## Docker notes
 
