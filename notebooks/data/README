@@ -1,3 +1,4 @@
 
-This `data` directory is intentionally left empty.
-To run the scripts either load or mount data here.
+This `data` directory contains
+publically available data shared for all workflow
+runs.
