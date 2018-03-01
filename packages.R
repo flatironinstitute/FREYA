@@ -15,10 +15,6 @@ if(!require('sva')) {
   biocLite("sva")
   library(sva)
 }
-if(!require('gplots')) {
-  install.packages('gplots')
-  library(gplots)
-}
 
 biocLite()
 
