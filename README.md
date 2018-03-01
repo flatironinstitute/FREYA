@@ -118,7 +118,7 @@ container similar to this:
 ```bash
 docker run -it --rm -p 8888:8888 \
    -v /Users/awatters/repos/FREYA/notebooks:/home/rstudio/notebooks:z \
-   -v /Users/awatters/misc/kiley_graim/kgraim/data:/home/rstudio/notebooks/data:z \
+   -v /Users/awatters/misc/kiley_graim/kgraim/user_data:/home/rstudio/notebooks/user_data:z \
    canine_bc:latest
 ```
 
