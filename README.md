@@ -6,6 +6,8 @@
 
 This is a public repository for canine breast cancer analysis.
 
+There are two main sub-pipelines in this analysis. The first, in DataPrep, will process raw data to create expression and mutation calls. The second, in notebooks, will take that data (or you can provide your own processed data) and perform a series of analyses, including comparing it to human breast cancer. The rest of this description walks through how the analysis side of the pipeline is set up. 
+
 The repository is designed to use 
 [`repo2docker`](https://repo2docker.readthedocs.io/en/latest/)
 to build a `docker` container which includes
