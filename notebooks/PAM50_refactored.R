@@ -14,6 +14,8 @@ if(!require('getopt')) {
   library(getopt)
 }
 
+require(methods) # glmnet needs this but it isn't loaded by default in Rscript
+
 ## usage, options and doc 
 argspec <- paste(get_Rscript_filename(), c(paste('predicts PAM50 subtypes based on TCGA BRCA RNA-Seq data and user-provided CMT RNA-Seq data.
 
@@ -132,7 +134,7 @@ dat.dog   <- dat.dog[,genes]
 dat.pam50 <- dat[,genes]
 
 ## Phenotype data for the dogs
-dog.clin <- read.table(fn.hist, sep=',', header=T, row.names=1) # This should be user input
+dog.clin <- read.table(fn.hist, sep=fn.sep, header=T, row.names=1) # This should be user input
 
 ## Subset dog expression & phenotype data to overlapping samples
 ids <- intersect( rownames(dog.clin), rownames(dat.dog) )
@@ -174,7 +176,9 @@ combat.edata <- sweep(combat.edata, 1, rowMeans(combat.edata))
 #####################################
 
 ## Irain subtype predictor, then predict dog samples
-res             <- cv.glmnet(combat.edata[rownames(pam50.labs),], pam50.labs[,1], family='multinomial')
+print('Training the predictor');flush.console()
+res             <- cv.glmnet(data.matrix(combat.edata[rownames(pam50.labs),]), pam50.labs[,1], family='multinomial')
+print('Predicting new labels');flush.console()
 preds           <- predict(res, combat.edata, type='class')
 rownames(preds) <- rownames(combat.edata)
 

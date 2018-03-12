@@ -1,4 +1,4 @@
-SampleID,Patient,Hist
+SampleID,PatientID,Hist
 Sample1,Yuki,N
 Sample2,KingTut,N
 Sample3,Ranger,N
