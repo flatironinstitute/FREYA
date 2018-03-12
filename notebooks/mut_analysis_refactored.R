@@ -24,6 +24,7 @@ argspec <- paste(get_Rscript_filename(), c(paste('runs mutations analysis on the
     ',get_Rscript_filename(),'-c <clinical/phenotype filename> -m <mutations filename>  -p <PEPs filename>
   Options:
     -n <integer>      (Minimum number of mutations per gene to be included in analysis (default 5)
+    -s <character>    (File containing predicted PAM50 subtypes for each sample. Can be produced using PAM50_refactored.R)
         ')))
 
 args <- commandArgs(TRUE)
@@ -39,6 +40,7 @@ if ( '--help' %in% args | '-h' %in% args ) {
 spec <- matrix( c( 
        'clinical',       'c', 1, 'character',
        'mutation',       'm', 1, 'character',
+       'pam50',          's', 2, 'character',
        'PEP',            'p', 1, 'character',
        'num',            'n', 2, 'integer'
       ),
@@ -64,12 +66,11 @@ fn.peps <- opt$PEP      # './data/CMT_peps.csv'  # PEP lists created in the expr
 
 ## Filenames that don't change between users
 data.dir <- './data/' # Working directory - we should be providing this with the requisite files # TODO: This will need to match the layout we give the whole pipeline. Have it be wherever we store the data
-fn.pam50        <- paste0(data.dir,'PAM50_dog.csv') # Created by PAM50_refactored.R, used doesn't need to provide (but should be optional???)
 fn.cosmic       <- paste0(data.dir,'genes_COSMIC.csv') # COSMIC genes list, should download most recent version instead of using included one?
 fn.pam50.genes  <- paste0(data.dir,'PAM50_genes.csv') # This list will never change, no need to have as input
 
 ## Make sure all of the required files exist - quit if any are missing
-for( fn in c(fn.hist, fn.muts, fn.peps, fn.pam50, fn.cosmic, fn.pam50.genes) ) {
+for( fn in c(fn.hist, fn.muts, fn.peps, fn.cosmic, fn.pam50.genes) ) {
   if(!file.exists(fn)) { print(paste('ERROR: Unable to locate',fn)); quit(save='no',status=1) }
 }
 
@@ -84,11 +85,13 @@ dat.hist$Patient <- as.character(dat.hist$Patient) # Ensure patient names are ch
 
 ## Load the PAM50 subtypes 
 ##   This file is created by PAM50_refactored.R, should just port straight over (don't need user to specify)
-pam50 <- read.table(fn.pam50, sep=',', row.names=1)
-
+if(!is.null(opt$pam50)) {
+#  fn.pam50        <- paste0(data.dir,'PAM50_dog.csv') # Created by PAM50_refactored.R, used doesn't need to provide (but should be optional???)
+  pam50 <- read.table(opt$pam50, sep=',', row.names=1)
 print('PAM50 subtype counts per patient:'); flush.console()
 print(table(pam50[,1], dat.hist[rownames(pam50),'Patient']))
 dat.hist$PAM50 <- pam50[rownames(dat.hist),1]
+}
 
 ## Load the list of COSMIC genes
 genes.cosmic <- rownames(read.table(fn.cosmic, sep=',', header=TRUE, row.names=1))
@@ -243,11 +246,13 @@ ggsave('MutationConsistency.pdf',width=13,height=7)
 ## Do the subtypes have different numbers of mutations (total, not just in PAM50 genes)
 ##   For samples of each subtype, print median num mutations in the samples
 num.muts <- apply(dat.bin, 2, sum)
-colnames(pam50)[1] <- 'PAM50'
-pam50$Muts <- NA
-pam50[colnames(dat.bin),'Muts'] <- num.muts
-print('PAM50 sample counts:'); flush.console()
-print(sapply( levels(pam50$PAM50), function(x) {median( pam50[pam50$PAM50==x,'Muts'], na.rm=TRUE )} )); flush.console() 
+if(!is.null(opt$pam50)) {
+  colnames(pam50)[1] <- 'PAM50'
+  pam50$Muts <- NA
+  pam50[colnames(dat.bin),'Muts'] <- num.muts
+  print('PAM50 sample counts:'); flush.console()
+  print(sapply( levels(pam50$PAM50), function(x) {median( pam50[pam50$PAM50==x,'Muts'], na.rm=TRUE )} )); flush.console() 
+}
 
 ### Are COSMIC genes more frequently mutated than non-COSMIC?
 print(res.ttest <- t.test( apply(dat.bin, 1, sum) ~ factor(rownames(dat.bin) %in% genes.cosmic) ))
@@ -260,27 +265,33 @@ flush.console()
 rm(res.ttest)
 
 ### Are PAM50 genes more frequently mutated than non-PAM50?
-genes.pam50 <- rownames(read.table(fn.pam50.genes, sep=',', row.names=1))
-print( res.ttest <- t.test( apply(dat.bin, 1, sum) ~ factor(rownames(dat.bin) %in% genes.pam50) ) ) 
-if( res.ttest$p.value < 0.05) {
-  print( paste('PAM50 genes are significantly more frequently mutated than non-COSMIC genes, p-value =', signif(res.ttest$p.value,digits=3)) )
-} else {
-  print( paste('PAM50 genes are NOT significantly more frequently mutated than non-COSMIC genes, p-value =', signif(res.ttest$p.value,digits=3)) )
+if(!is.null(opt$pam50)) {
+  genes.pam50 <- rownames(read.table(fn.pam50.genes, sep=',', row.names=1))
+  print( res.ttest <- t.test( apply(dat.bin, 1, sum) ~ factor(rownames(dat.bin) %in% genes.pam50) ) ) 
+  if( res.ttest$p.value < 0.05) {
+    print( paste('PAM50 genes are significantly more frequently mutated than non-COSMIC genes, p-value =', signif(res.ttest$p.value,digits=3)) )
+  } else {
+    print( paste('PAM50 genes are NOT significantly more frequently mutated than non-COSMIC genes, p-value =', signif(res.ttest$p.value,digits=3)) )
+  }
+  rm(res.ttest)
+  flush.console()
 }
-rm(res.ttest)
-flush.console()
 
 ## Correlate mutations w/clinical factors of interest- this will return a matrix of dat.hist columns by genes, filled with corrected pvals 
 print(paste('Calculating correlations between mutations and phenotype data (Patient, Location, Histology, etc) in genes with >',opt$num,'mutations in the cohort.'))
 get.pvals <- function(id) {
-  phen.cols <- c('Patient','Location','Goldschmidt','Hist','SimHist','DetHist','PAM50') # Which clinical factors we care about
+  phen.cols <- c('Patient','Location','Goldschmidt','Hist','SimHist','DetHist') # Which clinical factors we care about
   phen.cols <- phen.cols[ phen.cols %in% colnames(dat.hist) ] # Make sure these are in the provided phenotype/clinical data
   p.adjust(apply(dat.hist[colnames(dat.bin),phen.cols], 2, function(x) {try(chisq.test(table( factor(x), unlist(dat.bin[id,])))$p.value)}))
 }
 genes       <- names(which(apply(dat.bin, 1, sum)>opt$num)) # Only care about frequently mutated genes
-genes.pvals <- sapply(genes, get.pvals)
-write.table(signif(t(genes.pvals),digits=5), file='FreqMutatedGenes_ClinicalCorrelations.csv', sep=',', col.names=TRUE, row.names=TRUE, quote=FALSE)
-print('Phenotype/Clinical correlations stored to file.')
+if( length(genes) > 0 ) {
+  genes.pvals <- sapply(genes, get.pvals)
+  write.table(signif(t(genes.pvals),digits=5), file='FreqMutatedGenes_ClinicalCorrelations.csv', sep=',', col.names=TRUE, row.names=TRUE, quote=FALSE)
+  print('Phenotype/Clinical correlations stored to file.')
+} else {
+  print('WARNING: Not enough mutated genes for clinical factor correlation analysis, skipping this step.')
+}
 
 ## Are PEP list genes more frequently mutated?
 ## Load the PEPs & print PEP genes that are frequently mutated
