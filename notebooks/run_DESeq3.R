@@ -55,7 +55,7 @@ data.dir <- './data/' # Working directory - we should be providing this with the
 fn.brca.seq   <- paste0(data.dir,'BRCA_rnaseq_paired_noMets.t.txt')
 fn.brca.pam50 <- paste0(data.dir,'BRCA_tumorVSnormal_paired.txt')
 fn.geneconvs  <- paste0(data.dir,'Canine_Human_Gene_Conversion.txt') # Human-dog conversion - TODO should read this from the dog genom version (see Dima's code)
-fn.cosmic       <- paste0(data.dir,'COSMIC_roles_in_cancer.csv') # COSMIC genes list, should download most recent version instead of using included one?
+fn.cosmic       <- paste0(data.dir,'roles_in_cancer.csv') # COSMIC genes list, should download most recent version instead of using included one?
 
 ## Make sure all of the required files exist - quit if any are missing
 for( fn in c(fn.peps, fn.brca.seq, fn.brca.pam50, fn.geneconvs, fn.cosmic) ) {
