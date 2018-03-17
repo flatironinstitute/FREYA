@@ -265,7 +265,7 @@ if [[ ${aaStages["mpicker"]} == ${doMe} ]]
 then
     log "mutation picker started."
     # This shouldn't be too resource intensive, so we may run it on the submission node.
-    ${DB_TASK_PREFIX} python ${CMWF_ROOT}/VCF_mutation_picker.0.5.py ${phenoCsv} ${outDir}/vcfs/CanineAll.ann.vcf ${outDir}/vcfs/mutations_genesOnly.csv > ${outDir}/vcfs/CanineAll_mp.txt 2> ${outDir}/logs/mpicker.log
+    ${DB_TASK_PREFIX} python ${CMWF_ROOT}/VCF_mutation_picker.0.6.py ${phenoCsv} ${outDir}/vcfs/CanineAll.ann.vcf ${outDir}/vcfs/mutations_genesOnly.csv > ${outDir}/vcfs/CanineAll_mp.txt 2> ${outDir}/logs/mpicker.log
 fi
 
 # Remind the user to clean up after reviewing the results. Provide
