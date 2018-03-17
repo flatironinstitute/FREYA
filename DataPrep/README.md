@@ -1,8 +1,8 @@
 
 "cmwf_csv.sh" is the processing pipeline that takes as input HTS
 *.fastq files as well as various reference files, and produces as
-output various summary files and of *.vcf files. Please see block
-comments with the script for more information.
+output various summary files and *.vcf files. Please see block
+comments within the script for more information.
 
 This pipeline has several dependencies, which are, in effect,
 described by the Dockerfile.
