@@ -73,5 +73,5 @@ Because the driver script will be run in your normal (non-singularity) environme
 
 
 
-[^1]: If push comes to shove, you could use could use a system like VirtualBox to create a virtual machine with docker, singularity and the appropriate permissions. This VM is needed only to build the image, not to execute it.
+[^1]: If push comes to shove, you could use a system like [VirtualBox](https://www.virtualbox.org/) to create a virtual machine with docker, singularity and the appropriate permissions. This VM is needed only to build the image, not to execute it.
 
