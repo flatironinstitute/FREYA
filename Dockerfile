@@ -4,7 +4,7 @@ RUN apt-get -y remove bash-completion
 
 RUN apt-get update && \
     apt-get -y install python3-pip bash-completion && \
-    pip3 install --no-cache-dir notebook==5.2 && \
+    pip3 install --no-cache-dir notebook==5.4.1 && \
     apt-get purge && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
