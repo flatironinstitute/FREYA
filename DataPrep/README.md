@@ -48,10 +48,12 @@ Running the pipeline via an image file
 
 In these examples we assume that you have a directory setup something like:
 
-`$FREYA_ROOT/FREYA
+```bash
+$FREYA_ROOT/FREYA
 $FREYA_ROOT/data
 $FREYA_ROOT/image
-$FREYA_ROOT/results`
+$FREYA_ROOT/results
+```
 
 where the first is a clone of this repo, the second holds the phenotype csv file and a subdirectory with the fastq files, the third your image file, and the fourth will hold the results.
 
