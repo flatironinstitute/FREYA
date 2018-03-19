@@ -16,8 +16,6 @@ The `repo2docker` tool requires the `docker` infrastructure
 and Python 3 to run.  See the 
 [installation instructions](https://repo2docker.readthedocs.io/en/latest/install.html).
 
-[Temporary note: eventually the repo should have the option to use Binder
-with no local install required.]
 
 To build the docker image from the command line
 
