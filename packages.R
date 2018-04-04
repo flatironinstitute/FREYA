@@ -23,3 +23,12 @@ if(!require('gplots')) {
   library(gplots)
 }
 
+if(!require('samr')) {
+ install.packages('samr')
+  library(samr)
+}
+
+if(!require('plyr')) {
+  install.packages('plyr')
+  library(plyr)
+}
