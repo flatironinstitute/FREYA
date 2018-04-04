@@ -24,8 +24,10 @@ if(!require('gplots')) {
 }
 
 if(!require('samr')) {
+ source("http://bioconductor.org/biocLite.R")
+ biocLite("impute")
  install.packages('samr')
-  library(samr)
+ library(samr)
 }
 
 if(!require('plyr')) {
