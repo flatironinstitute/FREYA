@@ -16,8 +16,6 @@ The `repo2docker` tool requires the `docker` infrastructure
 and Python 3 to run.  See the 
 [installation instructions](https://repo2docker.readthedocs.io/en/latest/install.html).
 
-[Temporary note: eventually the repo should have the option to use Binder
-with no local install required.]
 
 To build the docker image from the command line
 
@@ -38,7 +36,7 @@ invoke `docker run` with the directory mounted like so:
 
 ```bash
 docker run -it --rm -p 8888:8888 \
-   -v /Path/to/your/data:/home/rstudio/notebooks/user_data:z \
+   -v /Path/to/your/data:/home/rstudio/DataAnalysis/user_data:z \
    canine_bc:latest
 ```
 
@@ -121,8 +119,8 @@ container similar to this:
 
 ```bash
 docker run -it --rm -p 8888:8888 \
-   -v /Users/awatters/repos/FREYA/notebooks:/home/rstudio/notebooks:z \
-   -v /Users/awatters/misc/kiley_graim/kgraim/user_data:/home/rstudio/notebooks/user_data:z \
+   -v /Users/awatters/repos/FREYA/DataAnalysis:/home/rstudio/DataAnalysis:z \
+   -v /Users/awatters/misc/kiley_graim/kgraim/user_data:/home/rstudio/DataAnalysis/user_data:z \
    canine_bc:latest
 ```
 
