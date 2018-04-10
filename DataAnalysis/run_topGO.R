@@ -13,8 +13,6 @@
 ## This script is intended for the FREYA pipeline and aims specifically at analyzing 2 way histology comparisons and CMT peps.
 ##   See the generic script for other usage.
 
-
-
 ###########################
 ###   Script setup
 ####################
@@ -64,8 +62,6 @@ spec <- matrix( c(
 opt <- getopt( spec=spec )
 
 # Set defaults for optional parameters
-#   Use tab delimiter if not provided
-if( is.null(opt$delim) )  { opt$delim  = '\t' }
 if( is.null(opt$outdir) ) { opt$outdir = 'PEP_GO' } 
 if( is.null(opt$cutoff) ) { opt$cutoff = 0.05 }
 if( is.null(opt$num) )    { opt$num    = 10 }
@@ -121,6 +117,9 @@ run_topGO <- function(peps, pep.name, alg='weight01', ns=opt$num) {
   ## Don't return results that are significantly under-represented
   dfresult <- dfresult[ dfresult$Significant > dfresult$Expected,]
 
+  ## Add list of genes in each set
+  dfresult$Genes <- sapply(dfresult$GO.ID, function(x) { paste(unlist(genesInTerm(topGOdata, x)), collapse=',') } )
+
   return( dfresult )
 } # End run_topGO
 
@@ -139,17 +138,26 @@ if(!require('goseq')) {
   install.packages('goseq')
   library(goseq)
 }
+if(!require('dplyr')) {
+  install.packages('dplyr')
+  library(dplyr)
+}
 
 ### Run topGO on each PEP
 peps <- read.table(opt$universe, sep=',', header=TRUE, stringsAsFactors=FALSE) # universe?
 print(paste('Successfully loaded gene universe and scores:',opt$universe)); flush.console()
 
-for( pep.name in c('Tumor_Expression_Pattern', 'Carcinoma_Expression_Pattern', 'Adenoma_Expression_Pattern') ) {
-  print(paste('Processing:',pep.name));flush.console()
-  dfresult <- run_topGO(peps, pep.name=pep.name)
-  head(dfresult)
-  write.table(dfresult, file=paste0(paste(opt$outdir,'PEPs_',sep='/'),pep.name,'.csv'), sep=',', col.names=TRUE, row.names=FALSE, quote=TRUE)
-}
+pep.names <- c('Tumor_Expression_Pattern', 'Carcinoma_Expression_Pattern', 'Adenoma_Expression_Pattern')
+go.res <- lapply(pep.names, function(x){ run_topGO(peps,pep.name=x) })
+names(go.res) <- pep.names
+
+#for( pep.name in c('Tumor_Expression_Pattern', 'Carcinoma_Expression_Pattern', 'Adenoma_Expression_Pattern') ) {
+#  print(paste('Processing:',pep.name));flush.console()
+#  dfresult <- run_topGO(peps, pep.name=pep.name)
+#  go.res[pep.name] <- dfresult
+  #head(dfresult)
+  #write.table(dfresult, file=paste0(paste(opt$outdir,'PEPs_',sep='/'),pep.name,'.csv'), sep=',', col.names=TRUE, row.names=FALSE, quote=TRUE)
+#}
 
 ### Run topGO using each histology contrast m_n from LRTtidied
 ## Load the profile metrics
@@ -173,19 +181,65 @@ if( !is.null(opt$two) ) {
   # Malignant vs Normal - only print significantly enriched terms (not significantly under-enriched)
   print('Processing: Malignant vs Normal');flush.console()
   dfresult <- run_topGO( as.data.frame(LRTtidied[ LRTtidied$contrast=='m_n',]),  pep.name='logFC')
-  write.table(dfresult[ dfresult$Significant > dfresult$Expected,], file=paste(opt$outdir,'2WAY_MvsN.csv',sep='/'), sep=',', col.names=TRUE, row.names=FALSE, quote=TRUE)
+  res.maligVSnormal <- dfresult # Save for later compiling
+  write.table(dfresult, file=paste(opt$outdir,'2WAY_MvsN.csv',sep='/'), sep=',', col.names=TRUE, row.names=FALSE, quote=TRUE)
 
   # Malignant vs Benign
   print('Processing: Malignant vs Benign');flush.console()
   dfresult <- run_topGO( as.data.frame(LRTtidied[ LRTtidied$contrast=='m_b',]),  pep.name='logFC')
-  write.table(dfresult[ dfresult$Significant > dfresult$Expected,], file=paste(opt$outdir,'2WAY_MvsB.csv',sep='/'), sep=',', col.names=TRUE, row.names=FALSE, quote=TRUE)
+  write.table(dfresult, file=paste(opt$outdir,'2WAY_MvsB.csv',sep='/'), sep=',', col.names=TRUE, row.names=FALSE, quote=TRUE)
 
 
   # Benign vs Normal
   print('Processing: Benign vs Normal');flush.console()
   dfresult <- run_topGO( as.data.frame(LRTtidied[ LRTtidied$contrast=='b_n',]),  pep.name='logFC')
-  write.table(dfresult[ dfresult$Significant > dfresult$Expected,], file=paste(opt$outdir,'2WAY_BvsN.csv',sep='/'), sep=',', col.names=TRUE, row.names=FALSE, quote=TRUE)
+  write.table(dfresult, file=paste(opt$outdir,'2WAY_BvsN.csv',sep='/'), sep=',', col.names=TRUE, row.names=FALSE, quote=TRUE)
 }
+
+## Combine the results into 1 table, save to file
+# P-val normal-carcinoma, Pvalue Tumor PEP, Pvalue Carcinoma PEP, Pvalue Adenoma PEP, SigGenes in Tumor PEP, SigGenes in Carcinoma PEP, SigGenes in Adenoma PEP
+
+## Drop to columns we're interested in
+go.res$Adenoma_Expression_Pattern   <- go.res$Adenoma_Expression_Pattern[,c('GO.ID','Term','pvalue','Genes')]
+go.res$Carcinoma_Expression_Pattern <- go.res$Carcinoma_Expression_Pattern[,c('GO.ID','Term','pvalue','Genes')]
+go.res$Tumor_Expression_Pattern     <- go.res$Tumor_Expression_Pattern[,c('GO.ID','Term','pvalue','Genes')]
+
+## Change to unique column names
+colnames(go.res$Adenoma_Expression_Pattern)   <- c('GO.ID','Term','PValueEnrich_in_Adenoma_Expression_Pattern','SigGenes_Adenoma_PEP')
+colnames(go.res$Carcinoma_Expression_Pattern) <- c('GO.ID','Term','PValueEnrich_in_Carcinoma_Expression_Pattern','SigGenes_Carcinoma_PEP')
+colnames(go.res$Tumor_Expression_Pattern)     <- c('GO.ID','Term','PValueEnrich_in_Tumor_Expression_Pattern','SigGenes_Tumor_PEP')
+
+## Combine the PEP results tables into 1
+res <- full_join(go.res$Tumor_Expression_Pattern, go.res$Carcinoma_Expression_Pattern, by=c('GO.ID','Term'))
+res <- full_join(go.res$Adenoma_Expression_Pattern, res, by=c('GO.ID','Term'))
+
+## Add Normal vs Carcinoma comparison if option is set
+## Either way, reorder columns based on which comparisons are included
+if( !is.null(opt$two) ) {
+  res.maligVSnormal <- res.maligVSnormal[,c('GO.ID','Term','pvalue')]
+  colnames(res.maligVSnormal) <- c('GO.ID','Term','PValueEnrich_in_Normal_vs_Carcinoma')
+  res <- full_join(res.maligVSnormal, res, by=c('GO.ID','Term'))
+  res <- res[, c('GO.ID','Term','PValueEnrich_in_Normal_vs_Carcinoma','PValueEnrich_in_Tumor_Expression_Pattern','PValueEnrich_in_Carcinoma_Expression_Pattern','PValueEnrich_in_Adenoma_Expression_Pattern','SigGenes_Tumor_PEP','SigGenes_Carcinoma_PEP','SigGenes_Adenoma_PEP')]   
+} else {
+  res <- res[, c('GO.ID','Term','PValueEnrich_in_Tumor_Expression_Pattern','PValueEnrich_in_Carcinoma_Expression_Pattern','PValueEnrich_in_Adenoma_Expression_Pattern','SigGenes_Tumor_PEP','SigGenes_Carcinoma_PEP','SigGenes_Adenoma_PEP')]   
+}
+
+## NA gene lists to empty string
+res$SigGenes_Tumor_PEP[is.na(res$SigGenes_Tumor_PEP)] <- ''
+res$SigGenes_Carcinoma_PEP[is.na(res$SigGenes_Carcinoma_PEP)] <- ''
+res$SigGenes_Adenoma_PEP[is.na(res$SigGenes_Adenoma_PEP)] <- ''
+
+## NA p-values to 1
+res$PValueEnrich_in_Tumor_Expression_Pattern[is.na(res$PValueEnrich_in_Tumor_Expression_Pattern)] <- 1
+res$PValueEnrich_in_Carcinoma_Expression_Pattern[is.na(res$PValueEnrich_in_Carcinoma_Expression_Pattern)] <- 1
+res$PValueEnrich_in_Adenoma_Expression_Pattern[is.na(res$PValueEnrich_in_Adenoma_Expression_Pattern)] <- 1
+res$PValueEnrich_in_Normal_vs_Carcinoma[is.na(res$PValueEnrich_in_Normal_vs_Carcinoma)] <- 1
+
+## Sort by Tumor P-value
+res <- res[with(res, order(PValueEnrich_in_Tumor_Expression_Pattern)),]
+
+## Save to file
+write.table(res, file=paste(opt$outdir, 'GO_Enrichment.csv', sep='/'), sep=',', col.names=T, row.names=F, quote=T)
 
 ## Wrap it all up
 print(paste('Finished, printing files to:',opt$outdir));flush.console()
