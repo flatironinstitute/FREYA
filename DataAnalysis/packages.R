@@ -22,13 +22,21 @@ if(!require('gplots')) {
 
 biocLite()
 
-if(!require('gplots')) {
-  install.packages('gplots')
-  library(gplots)
-}
-
 if(!require('sva')) {
   source("https://bioconductor.org/biocLite.R")
   biocLite("sva")
   library(sva)
+}
+
+if(!require('topGO')) {
+  install.packages('topGO')
+  library(topGO)
+}
+if(!require('goseq')) {
+  install.packages('goseq')
+  library(goseq)
+}
+if(!require('dplyr')) {
+  install.packages('dplyr')
+  library(dplyr)
 }
