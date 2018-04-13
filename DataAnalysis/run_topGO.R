@@ -198,6 +198,7 @@ if( !is.null(opt$two) ) {
 
 ## Combine the results into 1 table, save to file
 # P-val normal-carcinoma, Pvalue Tumor PEP, Pvalue Carcinoma PEP, Pvalue Adenoma PEP, SigGenes in Tumor PEP, SigGenes in Carcinoma PEP, SigGenes in Adenoma PEP
+print('Generating the supplemental table with results.'); flush.console()
 
 ## Drop to columns we're interested in
 go.res$Adenoma_Expression_Pattern   <- go.res$Adenoma_Expression_Pattern[,c('GO.ID','Term','pvalue','Genes')]
@@ -233,7 +234,7 @@ res$SigGenes_Adenoma_PEP[is.na(res$SigGenes_Adenoma_PEP)] <- ''
 res$PValueEnrich_in_Tumor_Expression_Pattern[is.na(res$PValueEnrich_in_Tumor_Expression_Pattern)] <- 1
 res$PValueEnrich_in_Carcinoma_Expression_Pattern[is.na(res$PValueEnrich_in_Carcinoma_Expression_Pattern)] <- 1
 res$PValueEnrich_in_Adenoma_Expression_Pattern[is.na(res$PValueEnrich_in_Adenoma_Expression_Pattern)] <- 1
-res$PValueEnrich_in_Normal_vs_Carcinoma[is.na(res$PValueEnrich_in_Normal_vs_Carcinoma)] <- 1
+if( !is.null(opt$two) ) { res$PValueEnrich_in_Normal_vs_Carcinoma[is.na(res$PValueEnrich_in_Normal_vs_Carcinoma)] <- 1 } # Only run if two-way histology is included
 
 ## Sort by Tumor P-value
 res <- res[with(res, order(PValueEnrich_in_Tumor_Expression_Pattern)),]

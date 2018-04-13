@@ -10,13 +10,11 @@ if(!require('glmnet')) {
   install.packages('glmnet')
   library(glmnet)
 }
+
 if(!require('sva')) {
-  source("https://bioconductor.org/biocLite.R")
   biocLite("sva")
   library(sva)
 }
-
-biocLite()
 
 if(!require('gplots')) {
   install.packages('gplots')
@@ -24,7 +22,6 @@ if(!require('gplots')) {
 }
 
 if(!require('samr')) {
- source("http://bioconductor.org/biocLite.R")
  biocLite("impute")
  install.packages('samr')
  library(samr)
@@ -34,3 +31,19 @@ if(!require('plyr')) {
   install.packages('plyr')
   library(plyr)
 }
+
+if(!require('topGO')) {
+  biocLite("topGO")
+  library(topGO)
+}
+
+if(!require('goseq')) {
+  biocLite("goseq")
+  library(goseq)
+}
+
+if(!require('dplyr')) {
+  install.packages('dplyr')
+  library(dplyr)
+}
+
