@@ -11,7 +11,6 @@ if(!require('glmnet')) {
   library(glmnet)
 }
 if(!require('sva')) {
-  source("https://bioconductor.org/biocLite.R")
   biocLite("sva")
   library(sva)
 }
@@ -19,21 +18,12 @@ if(!require('gplots')) {
   install.packages('gplots')
   library(gplots)
 }
-
-biocLite()
-
-if(!require('sva')) {
-  source("https://bioconductor.org/biocLite.R")
-  biocLite("sva")
-  library(sva)
-}
-
 if(!require('topGO')) {
-  install.packages('topGO')
+  biocLite("topGO")
   library(topGO)
 }
 if(!require('goseq')) {
-  install.packages('goseq')
+  biocLite("goseq")
   library(goseq)
 }
 if(!require('dplyr')) {
