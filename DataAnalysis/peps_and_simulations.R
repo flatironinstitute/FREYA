@@ -34,9 +34,9 @@ argspec <- paste(get_Rscript_filename(), c(paste('Generates PEP lists and runs s
     ',get_Rscript_filename(),' -s <phenotype data
   Options:
     -o <output directory>     Directory to write/store results
-    -i <mapping>              Number of simulations to run
+    -i <iterations>           Number of simulations to run
     -d <data directory>       Directory containing any input files
-    -c <data directory>       Directory containing counts files
+    -c <counts directory>     Directory containing counts files
         ')))
 
 args <- commandArgs(TRUE)
@@ -66,6 +66,11 @@ if( is.null(opt$iterations) ) { opt$iterations = 300 }
 if( is.null(opt$datadir) ) { opt$datadir = './' }
 if( is.null(opt$countdir) ) { opt$countdir = '../' }
 if( is.null(opt$outdir) ) { opt$outdir = './output' }
+
+if( is.null(opt$samplesCanine) ) {
+  print("ERROR: samplesCanine is a required argument"); flush.console()
+  quit(save='no',status=1)
+}
 
 
 ## If the output directory doesn't exist, create it
@@ -123,6 +128,7 @@ pick.2.samples <- function(pat.num) {
 
 ## Load the function to generate PEP lists.
 ##   NOTE: This takes some time to load
+load(paste(opt$datadir,'humanmapping.rda', sep='/')) #TODO
 source('run_genPEPs.R') 
 
 ## Load phenotype data for the dogs

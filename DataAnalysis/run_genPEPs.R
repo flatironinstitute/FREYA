@@ -17,10 +17,6 @@ library(edgeR)
 library(biomaRt,pos = "package:base")
 library(reshape2)
 
-
-## Load the previously prepared human mapping file
-load('humanmapping.rda')
-
 ############
 ### Prepare Data & Identify Differentially Expressed Genes
 ########
