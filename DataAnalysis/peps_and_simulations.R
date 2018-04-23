@@ -53,6 +53,7 @@ spec <- matrix( c(
        'samplesCanine',            's', 1, 'character',
        'iterations',               'i', 2, 'integer',
        'datadir',                  'd', 2, 'character',
+       'outdir',                   'o', 2, 'character',
        'countdir',                 'c', 2, 'character'
       ),
     ncol=4,
