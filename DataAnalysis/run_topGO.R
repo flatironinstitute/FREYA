@@ -65,7 +65,7 @@ opt <- getopt( spec=spec )
 if( is.null(opt$outdir) ) { opt$outdir = 'PEP_GO' } 
 if( is.null(opt$cutoff) ) { opt$cutoff = 0.05 }
 if( is.null(opt$num) )    { opt$num    = 10 }
-opt$workingdir <- '../user_data' # TODO: Finish combining
+opt$workingdir <- './user_data'
 
 
 ## If the output directory doesn't exist, create it
