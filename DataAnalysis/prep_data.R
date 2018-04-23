@@ -56,19 +56,54 @@ if(!dir.exists(opt$outdir)) {
   system(paste('mkdir -p',opt$outdir))
 }
 
-library(knitr)
-library(plyr)
-library(dplyr)
-library(broom)
-library(biobroom)
-library(tidyr)
-library(qvalue)
-library(edgeR)
-library(biomaRt,pos = "package:base")
-library(reshape2)
-#library(bindrcpp)
+## Load libraries, install if not already
+source("https://bioconductor.org/biocLite.R")
 
-library(devtools)
+if(!require('knitr')) {
+  install.packages('knitr')
+  library(knitr)
+}
+if(!require('plyr')) {
+  install.packages('plyr')
+  library(plyr)
+}
+if(!require('dplyr')) {
+  install.packages('dplyr')
+  library(dplyr)
+}
+if(!require('broom')) {
+  install.packages('broom')
+  library(broom)
+}
+if(!require('biobroom')) {
+  biocLite("biobroom")
+  library(biobroom)
+}
+if(!require('tidyr')) {
+  install.packages('tidyr')
+  library(tidyr)
+}
+if(!require('qvalue')) {
+  biocLite("qvalue")
+  library(qvalue)
+}
+if(!require('edgeR')) {
+  biocLite("edgeR")
+  library(edgeR)
+}
+if(!require('biomaRt')) {
+  biocLite("biomaRt")
+  library(biomaRt,pos = "package:base")
+}
+if(!require('reshape2')) {
+  install.packages('reshape2')
+  library(reshape2)
+}
+if(!require('devtools')) {
+  install.packages('devtools')
+  library(devtools)
+}
+
 knitr::opts_chunk$set(warning = FALSE,
                       message = FALSE,
                       prompt = FALSE)

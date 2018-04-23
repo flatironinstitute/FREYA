@@ -102,7 +102,7 @@ get.labs <- function(comps) {
     labs <- labs[ids,]
   }
 
-  genes.all <- read.table('/Users/kgraim/Documents/CanineCancer/Canine_Human_Gene_Conversion.txt', sep='\t', header=T, stringsAsFactors=F) # TODO: Update filename & location
+  genes.all <- read.table(paste(opt$datadir,'Canine_Human_Gene_Conversion.txt',sep='/'), sep='\t', header=T, stringsAsFactors=F)
   dat <- dat[,colnames(dat) %in% genes.all$Hum_Symb]
   return( list(dat, labs) )
 }
@@ -127,30 +127,8 @@ load.peps <- function(fn) {
 ### Code to run
 ##########
 
-
-## Load the data - TODO do I need to load anything aside from the peps?
+## Load the data
 peps <- load.peps(paste(opt$workingdir, opt$PEP, sep='/')) 
-#peps <- load.peps(paste(opt$workingdir, 'CMT_PEPs.csv', sep='/')) 
-dat <- read.table(paste(opt$datadir, 'BRCA_rnaseq_paired_noMets.t.txt',sep='/'), sep='\t', header=T, row.names=1, check.names=F)
-dat <- as.matrix(dat) + 1
-dat <- log(dat, base=2)
-rownames(dat) <- substr(rownames(dat),1,15)
-
-## Load the labels and subset to the labeled data
-labs <- read.table(paste(opt$datadir,'BRCA_PAM50_labels.csv',sep='/'), sep=',', header=TRUE, row.names=1, check.names=FALSE, stringsAsFactors=FALSE)
-
-## Subset to shared samples
-ids <- intersect( rownames(labs), rownames(dat) )
-dat <- dat[ids,]
-labs <- labs[ids,,drop=FALSE]
-
-## Subset to homologous genes
-genes.all <- read.table('/Users/kgraim/Documents/CanineCancer/Canine_Human_Gene_Conversion.txt', sep='\t', header=T, stringsAsFactors=F) # TODO: Update filename & location
-dat <- dat[,colnames(dat) %in% genes.all$Hum_Symb]
-
-## Calculate standard deviation and list of non-PEP genes, for later comparisons
-sd.genes <- sd(dat)
-non.pep.genes <- colnames(dat)[ !colnames(dat) %in% peps$Gene ]
 
 ## Define the list of comparisons we want to make
 comparisons <- list( c('TUMOR','NORMAL'), c('Basal','Luminal'), c('LumA','Normal'), c('LumB','Normal'), c('Luminal','Normal'), c('Basal','Normal') ) 
@@ -172,6 +150,10 @@ for( comps in comparisons ) {
     dat <- dat.list[[1]]
     labs <- dat.list[[2]]
 
+    ## Calculate standard deviation of all genes, and non-PEP gene list
+    sd.genes <- sd(dat)
+    non.pep.genes <- colnames(dat)[ !colnames(dat) %in% peps$Gene ]
+
     ## Get the list of genes in the current PEP
     genes <- c(non.pep.genes, as.character(peps[ peps$PEP==pep.name, 'Gene' ]))
     genes <- genes[ genes %in% colnames(dat) ]
@@ -179,8 +161,8 @@ for( comps in comparisons ) {
     ## Calculate and print PAGE score for this comparison
     res <- sapply(genes, function(gene) { ( (mean( dat[labs==comps[1],gene] ) - mean( dat[labs==comps[2],gene] ) ) * sqrt(sum(peps$PEP==pep.name)) ) / sd.genes } )
     temp <- data.frame( PAGE=res, PEP=names(res) %in% peps[ peps$PEP==pep.name,'Gene' ] )
-    write(paste(pep.name,signif(wilcox.test( PAGE ~ PEP, data=temp )$p.value,digits=5), sep='\t\t'), file=paste(opt$outdir,'PAGE.txt', sep='/'), append=TRUE)
-    print( paste(pep.name,signif(wilcox.test( PAGE ~ PEP, data=temp )$p.value,digits=5)) ); flush.console()
+    write(paste(pep.name,signif(wilcox.test( PAGE ~ PEP, data=temp )$p.value,digits=3), sep='\t'), file=paste(opt$outdir,'PAGE.txt', sep='/'), append=TRUE)
+    print( paste(pep.name,signif(wilcox.test( PAGE ~ PEP, data=temp )$p.value,digits=3)) ); flush.console()
     
   } # End PEPs loop
 } # End comps loop
