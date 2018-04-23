@@ -62,7 +62,7 @@ spec <- matrix( c(
 opt <- getopt( spec=spec )
 
 # Set defaults for optional parameters
-if( is.null(opt$outdir) ) { opt$outdir = 'PEP_GO' } 
+if( is.null(opt$outdir) ) { opt$outdir = 'output' } 
 if( is.null(opt$cutoff) ) { opt$cutoff = 0.05 }
 if( is.null(opt$num) )    { opt$num    = 10 }
 opt$workingdir <- './user_data'

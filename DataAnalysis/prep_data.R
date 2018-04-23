@@ -116,6 +116,23 @@ knitr::opts_chunk$set(warning = FALSE,
 print('Loading phenotype data'); flush.console()
 samplesCanine <- read.csv(paste(opt$datadir,'samples_canine_updated.csv',sep='/'))
 
+## Create the count files convert to gene level counts
+print('Creating the count files'); flush.console()
+fn.txt <- list.files(path=paste(opt$datadir,"dexseq_count/",sep='/'), pattern="*.txt", full.names=FALSE, recursive=FALSE)
+fn.txt <- paste(opt$datadir, 'dexseq_count', fn.txt, sep='/')
+for(fn in fn.txt) {
+  print( paste('Processing sample', fn) ); flush.console()
+  dat.fn <- read.table(fn, sep='\t', header=FALSE, stringsAsFactors=FALSE)
+  ids.genes <- sapply(dat.fn$V1, function(x) {unlist(strsplit(x,':'))[1] } )
+
+  dat    <- aggregate(dat.fn[,2,drop=FALSE], by=list(ids.genes), FUN=sum)
+  rownames(dat) <- dat$Group.1
+  dat <- dat[,-1,drop=FALSE]
+  dat <- dat[unique(ids.genes),,drop=FALSE]
+
+  write.table( dat, file=paste(opt$datadir,'dexseq_count',paste(tools::file_path_sans_ext(basename(fn)), 'count',sep='.'),sep='/'), sep ='\t', quote=FALSE, col.names=FALSE, row.names=TRUE ) # TODO
+}
+
 ## Read in Count Data
 print('Loading count data'); flush.console()
 counts <- readDGE(samplesCanine$File, paste(opt$datadir,"dexseq_count/",sep='/'), header = FALSE)
@@ -154,7 +171,7 @@ LRTtidied <- ldply(lrt_list, tidy,.id = "contrast") %>%
 ##    NOTE: Sometimes the bioMart datasets won't load. Just wait a bit and try again, they usually come back up quickly
 if(!opt$map.human) {
   print('Using previously generated human mapping file'); flush.console()
-  load('humanmapping.rda')
+  load(paste(opt$datadir,"humanmapping.rda",sep='/'))
 } else {
   print('Generating new human mapping file'); flush.console()
   allgenes <- LRTtidied %>% ungroup %>% select(gene) %>% distinct %>% .$gene
