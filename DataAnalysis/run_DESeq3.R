@@ -22,6 +22,10 @@ argspec <- paste(get_Rscript_filename(), c(paste('compares differential expressi
 
   Usage: 
     ',get_Rscript_filename(),'-p <PEPs filename>
+
+  Options:
+    -o <output directory>     Directory to write/store enrichment results
+
         ')))
 
 args <- commandArgs(TRUE)
@@ -35,7 +39,8 @@ if ( '--help' %in% args | '-h' %in% args ) {
 
 ## Set up input specs (long flag, short flag, required/optional, type)
 spec <- matrix( c(
-       'PEP',            'p', 1, 'character'
+       'PEP',            'p', 1, 'character',
+       'outdir',         'o', 2, 'character'
       ),
     ncol=4,
     byrow=TRUE
@@ -43,8 +48,13 @@ spec <- matrix( c(
 
 opt <- getopt( spec=spec )
 
+# Set defaults for optional parameters
+if( is.null(opt$outdir) ) { opt$outdir = './results' }
+
 ## Set the arguments to easy-to-read names
 fn.peps <- opt$PEP      # './data/CMT_peps.csv'  # PEP lists created in the expression pipeline. This is also Supp Table 1 in the manuscript 
+out.dir  <- opt$outdir
+
 
 #########################################
 ## Load all data needed for this R script
@@ -158,7 +168,7 @@ ggplot(na.omit(peps[peps$PEP!='nonPEP',])) +
   theme(axis.title = element_text(size=20), axis.text  = element_text(vjust=0.5, size=16)) +
   geom_hline( aes(yintercept=median(peps[ peps$PEP=='nonPEP', 'AbsLog10FoldChange'])),color='black',linetype='dotdash',lwd=1.5 ) + # Non-PEP genes 
   guides(fill = "none")
-ggsave('PEP_BRCA_AbsLogFoldChange.pdf',width=8,height=6)
+ggsave(paste(out.dir,'PEP_BRCA_AbsLogFoldChange.pdf',sep='/'),width=8,height=6)
 
 mean(sig.genes$AbsLog10FoldChange)
 
@@ -189,10 +199,10 @@ tbl <- tbl[,which(colnames(tbl)%in%c('Adenoma','Carcinoma','Tumor'))] # Don't sh
 print(tbl); flush.console()
 
 print('Storing to file'); flush.console()
-write.table(diff.eq[diff.eq$PEP!='nonPEP',], file='PEP_Roles_in_Cancer_summary.csv', col.names=TRUE, row.names=FALSE, quote=FALSE, sep=',')
+write.table(diff.eq[diff.eq$PEP!='nonPEP',], file=paste(out.dir,'PEP_Roles_in_Cancer_summary.csv',sep='/'), col.names=TRUE, row.names=FALSE, quote=FALSE, sep=',')
 
 ## Plot & save
-pdf("PEP_Roles_in_Cancer_Barplot.pdf")
+pdf(paste(out.dir,"PEP_Roles_in_Cancer_Barplot.pdf",sep='/'))
 barplot(tbl, legend=TRUE, ylim=c(0,max(apply(tbl,2,sum))+8), col=cols[c(4,5,7)]) # Add vertical space for legend
 dev.off()
 

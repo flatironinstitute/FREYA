@@ -23,8 +23,9 @@ argspec <- paste(get_Rscript_filename(), c(paste('runs mutations analysis on the
   Usage: 
     ',get_Rscript_filename(),'-c <clinical/phenotype filename> -m <mutations filename>  -p <PEPs filename>
   Options:
-    -n <integer>      (Minimum number of mutations per gene to be included in analysis (default 5)
-    -s <character>    (File containing predicted PAM50 subtypes for each sample. Can be produced using PAM50_refactored.R)
+    -n <integer>              (Minimum number of mutations per gene to be included in analysis (default 5)
+    -s <character>            (File containing predicted PAM50 subtypes for each sample. Can be produced using PAM50_refactored.R)
+    -o <output directory>     Directory to write/store enrichment results (default ./results/)
         ')))
 
 args <- commandArgs(TRUE)
@@ -42,6 +43,7 @@ spec <- matrix( c(
        'mutation',       'm', 1, 'character',
        'pam50',          's', 2, 'character',
        'PEP',            'p', 1, 'character',
+       'outdir',         'o', 2, 'character',
        'num',            'n', 2, 'integer'
       ),
     ncol=4,
@@ -51,7 +53,8 @@ spec <- matrix( c(
 opt <- getopt( spec=spec )
 
 #set some reasonable defaults for optional parameters
-if( is.null(opt$num) ) { opt$num = 5 }
+if( is.null(opt$num) )    { opt$num = 5 }
+if( is.null(opt$outdir) ) { opt$outdir = './results' }
 
 ## Set the arguments to easy-to-read names
 fn.hist <- opt$clinical # './data/UserDogData_Phenotype.csv' # User-provided
@@ -77,7 +80,6 @@ for( fn in c(fn.hist, fn.muts, fn.peps, fn.cosmic, fn.pam50.genes) ) {
 ## Load the clinical data, extract dog IDs
 print('Loading script data'); flush.console()
 dat.hist <- read.table(fn.hist, sep=',', header=TRUE, row.names=1)
-if('9A' %in% rownames(dat.hist)) {rownames(dat.hist)[which(rownames(dat.hist)=='9A')] <- '9A1' } # TODO: Specific to our dataset only! Remove this line once we're done testing (or if we switch 9A1.bam to 9A.bam)
 
 ## Alphabetic IDs for each dog instead of numeric
 ## Generally don't need this- only CMTGA changes up the names halfway through
@@ -104,6 +106,7 @@ dat.bin[dat.bin>0] <- 1
 
 ## Create 2 matrices: Benign and Malignant samples
 print('Creating the mutations matrices.'); flush.console()
+print(table(dat.hist$Hist))
 dat.m <- dat.bin[,rownames(dat.hist)[dat.hist$Hist=='M']]
 dat.b <- dat.bin[,rownames(dat.hist)[dat.hist$Hist=='B']]
 
@@ -146,7 +149,7 @@ mut.rates <- data.frame(Muts=apply(dat.bin, 2, sum), Hist=dat.hist[colnames(dat.
 
 ## Plot the subfigure
 ggplot(mut.rates, aes(Dog, Muts)) + geom_bar(aes(fill = Hist), position = "dodge", stat="identity") + scale_fill_manual(values=cols.hist[2:3]) + theme_minimal() + coord_flip() + theme(axis.text.x=element_text(angle = -325, hjust = 1), text = element_text(size=30))
-ggsave('Sample_Mut_Rates.pdf',width=4,height=10)
+ggsave(paste(opt$outdir, 'Sample_Mut_Rates.pdf',sep='/'),width=4,height=10)
 
 
 #########################################
@@ -157,7 +160,7 @@ print('Generating density plot'); flush.console()
 ## Count mutations in each benign & malignant sample, create and save density plot
 samples.freq <- data.frame(Mutations=apply(dat, 2, sum), Hist=dat.hist[colnames(dat),'Hist'])
 ggplot(samples.freq) + geom_density(aes(Mutations,group=Hist,col=Hist),lwd=3) + scale_color_manual(values=cols.hist[2:3]) + theme_bw() + theme(text = element_text(size=20))
-ggsave('Sample_Mutation_Counts_Density.pdf',width=12, height=4)
+ggsave(paste(opt$outdir, 'Sample_Mutation_Counts_Density.pdf',sep='/'),width=12, height=4)
 
 ## Print the median number of mutated genes per histology
 print( paste('Median mutations in benign samples:', median( samples.freq[samples.freq$Hist=='B','Mutations']) )); flush.console()
@@ -208,7 +211,7 @@ ggplot(dat.melted) + geom_point(aes(Gene, Dog, col=Tumor), size=8, pch=15) +
   geom_point(aes(Gene,Dog,col=Benign), size=4, pch=16) +
   theme(axis.text.x=element_text(angle = -325, hjust = 1)) +
   scale_color_manual(values=c('white',cols[10]))
-ggsave('COSMIC_Genes_Mutations.pdf', width=10, height=5.5)
+ggsave(paste(opt$outdir, 'COSMIC_Genes_Mutations.pdf',sep='/'), width=10, height=5.5)
 
 
 #########################################
@@ -236,7 +239,7 @@ ggplot(dat.bin.melted) +
   theme_classic() +
   theme(legend.position='none',axis.text.x=element_text(angle = -325, hjust = 1)) +
   geom_vline(xintercept=cumsum(s.counts[-length(s.counts)])+0.5,col=cols[14],size=2)
-ggsave('MutationConsistency.pdf',width=13,height=7)
+ggsave(paste(opt$outdir, 'MutationConsistency.pdf',sep='/'),width=13,height=7)
 
 
 #########################################
@@ -287,7 +290,7 @@ get.pvals <- function(id) {
 genes       <- names(which(apply(dat.bin, 1, sum)>opt$num)) # Only care about frequently mutated genes
 if( length(genes) > 0 ) {
   genes.pvals <- sapply(genes, get.pvals)
-  write.table(signif(t(genes.pvals),digits=5), file='FreqMutatedGenes_ClinicalCorrelations.csv', sep=',', col.names=TRUE, row.names=TRUE, quote=FALSE)
+  write.table(signif(t(genes.pvals),digits=5), file=paste(opt$outdir, 'FreqMutatedGenes_ClinicalCorrelations.csv',sep='/'), sep=',', col.names=TRUE, row.names=TRUE, quote=FALSE)
   print('Phenotype/Clinical correlations stored to file.')
 } else {
   print('WARNING: Not enough mutated genes for clinical factor correlation analysis, skipping this step.')

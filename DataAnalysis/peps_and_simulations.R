@@ -31,7 +31,7 @@ if(!require('getopt')) {
 argspec <- paste(get_Rscript_filename(), c(paste('Generates PEP lists and runs simulation tests.
 
   Usage: 
-    ',get_Rscript_filename(),' -s <phenotype data
+    ',get_Rscript_filename(),' -s <phenotype data> -m <mapping file>
   Options:
     -o <output directory>     Directory to write/store results
     -i <iterations>           Number of simulations to run
@@ -53,6 +53,7 @@ spec <- matrix( c(
        'samplesCanine',            's', 1, 'character',
        'iterations',               'i', 2, 'integer',
        'datadir',                  'd', 2, 'character',
+       'mapping',                  'm', 1, 'character',
        'outdir',                   'o', 2, 'character',
        'countdir',                 'c', 2, 'character'
       ),
@@ -66,7 +67,7 @@ opt <- getopt( spec=spec )
 if( is.null(opt$iterations) ) { opt$iterations = 300 }
 if( is.null(opt$datadir) ) { opt$datadir = './' }
 if( is.null(opt$countdir) ) { opt$countdir = '../' }
-if( is.null(opt$outdir) ) { opt$outdir = './output' }
+if( is.null(opt$outdir) ) { opt$outdir = './results' }
 
 if( is.null(opt$samplesCanine) ) {
   print("ERROR: samplesCanine is a required argument"); flush.console()
@@ -129,13 +130,15 @@ pick.2.samples <- function(pat.num) {
 
 ## Load the function to generate PEP lists.
 ##   NOTE: This takes some time to load
-load(paste(opt$datadir,'humanmapping.rda', sep='/')) #TODO
+#load(paste(opt$datadir,'humanmapping.rda', sep='/')) #TODO
+load(opt$mapping) # TODO
 source('run_genPEPs.R') 
 
 ## Load phenotype data for the dogs
 ## Make sure the required phenotype columns are in the data, quit if any are missing
 print('Loading phenotype data...');flush.console()
-dat.hist <- read.csv(paste(opt$datadir,opt$samplesCanine, sep='/')) #dat.hist <- read.csv('samples_canine_updated.csv')
+print(paste(opt$datadir,opt$samplesCanine, sep='/'))
+dat.hist <- read.csv(paste(opt$datadir,opt$samplesCanine, sep='/'))
 if( all(c('Qlabel','Hist') %in% colnames(dat.hist)) ) {
   print(paste('Success,',nrow(dat.hist),'dog samples loaded.'));flush.console()
 } else {

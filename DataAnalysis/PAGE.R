@@ -56,7 +56,7 @@ spec <- matrix( c(
 opt <- getopt( spec=spec )
 
 # Set defaults for optional parameters
-if( is.null(opt$outdir) ) { opt$outdir = './output' }
+if( is.null(opt$outdir) ) { opt$outdir = './results' }
 if( is.null(opt$datadir) ) { opt$datadir = '../data' }
 if( is.null(opt$workingdir) ) { opt$workingdir = '../user_data' }
 
@@ -128,7 +128,8 @@ load.peps <- function(fn) {
 ##########
 
 ## Load the data
-peps <- load.peps(paste(opt$workingdir, opt$PEP, sep='/')) 
+#peps <- load.peps(paste(opt$workingdir, opt$PEP, sep='/')) 
+peps <- load.peps(opt$PEP)
 
 ## Define the list of comparisons we want to make
 comparisons <- list( c('TUMOR','NORMAL'), c('Basal','Luminal'), c('LumA','Normal'), c('LumB','Normal'), c('Luminal','Normal'), c('Basal','Normal') ) 

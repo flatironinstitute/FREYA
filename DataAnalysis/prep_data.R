@@ -46,9 +46,9 @@ spec <- matrix( c(
 opt <- getopt( spec=spec )
 
 ### set some reasonable defaults
-if( is.null(opt$outdir) ) { opt$outdir = 'output/' }
+if( is.null(opt$outdir) ) { opt$outdir = 'results/' }
 if( is.null(opt$map.human) ) { opt$map.human = FALSE } # Set to TRUE if you want to regenerate the human mapping file.
-if( is.null(opt$datadir) ) { opt$datadir = './' }
+if( is.null(opt$datadir) ) { opt$datadir = './data' }
 
 ## If the output directory doesn't exist, create it
 if(!dir.exists(opt$outdir)) {
@@ -57,52 +57,65 @@ if(!dir.exists(opt$outdir)) {
 }
 
 ## Load libraries, install if not already
-source("https://bioconductor.org/biocLite.R")
+#source("https://bioconductor.org/biocLite.R")
 
-if(!require('knitr')) {
-  install.packages('knitr')
-  library(knitr)
-}
-if(!require('plyr')) {
-  install.packages('plyr')
-  library(plyr)
-}
-if(!require('dplyr')) {
-  install.packages('dplyr')
-  library(dplyr)
-}
-if(!require('broom')) {
-  install.packages('broom')
-  library(broom)
-}
-if(!require('biobroom')) {
-  biocLite("biobroom")
-  library(biobroom)
-}
-if(!require('tidyr')) {
-  install.packages('tidyr')
-  library(tidyr)
-}
-if(!require('qvalue')) {
-  biocLite("qvalue")
-  library(qvalue)
-}
-if(!require('edgeR')) {
-  biocLite("edgeR")
-  library(edgeR)
-}
-if(!require('biomaRt')) {
-  biocLite("biomaRt")
-  library(biomaRt,pos = "package:base")
-}
-if(!require('reshape2')) {
-  install.packages('reshape2')
-  library(reshape2)
-}
-if(!require('devtools')) {
-  install.packages('devtools')
-  library(devtools)
-}
+#if(!require('knitr')) {
+#  install.packages('knitr')
+#  library(knitr)
+#}
+#if(!require('plyr')) {
+#  install.packages('plyr')
+#  library(plyr)
+#}
+#if(!require('dplyr')) {
+#  install.packages('dplyr')
+#  library(dplyr)
+#}
+#if(!require('broom')) {
+#  install.packages('broom')
+#  library(broom)
+#}
+#if(!require('biobroom')) {
+#  biocLite("biobroom")
+#  library(biobroom)
+#}
+#if(!require('tidyr')) {
+#  install.packages('tidyr')
+#  library(tidyr)
+#}
+#if(!require('qvalue')) {
+#  biocLite("qvalue")
+#  library(qvalue)
+#}
+#if(!require('edgeR')) {
+#  biocLite("edgeR")
+#  library(edgeR)
+#}
+#if(!require('biomaRt')) {
+#  biocLite("biomaRt")
+#  library(biomaRt,pos = "package:base")
+#}
+#if(!require('reshape2')) {
+#  install.packages('reshape2')
+#  library(reshape2)
+#}
+#if(!require('devtools')) {
+#  install.packages('devtools')
+#  library(devtools)
+#}
+
+library(knitr)
+library(plyr)
+library(dplyr)
+library(broom)
+library(biobroom)
+library(tidyr)
+library(qvalue)
+library(edgeR)
+library(biomaRt,pos = "package:base")
+library(reshape2)
+
+library(devtools)
 
 knitr::opts_chunk$set(warning = FALSE,
                       message = FALSE,
@@ -171,7 +184,7 @@ LRTtidied <- ldply(lrt_list, tidy,.id = "contrast") %>%
 ##    NOTE: Sometimes the bioMart datasets won't load. Just wait a bit and try again, they usually come back up quickly
 if(!opt$map.human) {
   print('Using previously generated human mapping file'); flush.console()
-  load(paste(opt$datadir,"humanmapping.rda",sep='/'))
+  load("./data/humanmapping.rda") # TODO: User should be allowed to specify this
 } else {
   print('Generating new human mapping file'); flush.console()
   allgenes <- LRTtidied %>% ungroup %>% select(gene) %>% distinct %>% .$gene
@@ -222,7 +235,7 @@ if(!opt$map.human) {
        Map_CanEns2HumEnt,
        Map_CanEns2HumEnt_unique,
        Map_CanEns2HumSymb,
-       Map_CanEns2HumSymb_unique,file="humanmapping.rda")
+       Map_CanEns2HumSymb_unique,file=paste(opt$outdir,"humanmapping.rda",sep='/'))
 
 } # End human mapping
 

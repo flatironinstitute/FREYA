@@ -23,6 +23,7 @@ argspec <- paste(get_Rscript_filename(), c(paste('predicts PAM50 subtypes based 
     ',get_Rscript_filename(),' -c <dog clinical/phenotype data> -e <dog expression data> -p <PEPs list>
   Options:
     -d <integer>      Delimiter used in CMT data files
+    -o <directory>    Directory for results files
         ')))
 
 args <- commandArgs(TRUE)
@@ -39,6 +40,7 @@ spec <- matrix( c(
        'clinical',       'c', 1, 'character',
        'expression',     'e', 1, 'character',
        'PEP',            'p', 1, 'character',
+       'outdir',         'o', 2, 'character',
        'delim',          'd', 2, 'character'
       ),
     ncol=4,
@@ -50,6 +52,8 @@ opt <- getopt( spec=spec )
 # Set defaults for optional parameters
 #   Use tab delimiter if not provided
 if( is.null(opt$delim) ) { opt$delim = '\t' }
+if( is.null(opt$outdir) ) { opt$outdir = './results' }
+
 
 ## Set the arguments to easy-to-read names
 data.dir <- './data/'      # Working directory - we should be providing this with the requisite files # TODO: This will need to match the layout we give the whole pipeline. Have it be wherever we store the data
@@ -57,6 +61,7 @@ fn.hist  <- opt$clinical   # './data/UserDogData_Phenotype.csv' # User-provided
 fn.dd    <- opt$expression # './data/UserDogData_RNASeq.tab'    # Dog RNASeq expression data filename
 fn.peps  <- opt$PEP        # './data/CMT_peps.csv'  # PEP lists created in the expression pipeline. This is also Supp Table 1 in the manuscript 
 fn.sep   <- opt$delim      # delimiter in their files, default should be tab
+fn.out   <- opt$outdir     # Results folder
 
 ## Filenames that don't change between users
 fn.pam50.genes  <- paste0(data.dir,'PAM50_genes.csv')       # This list will never change, no need to have as input
@@ -183,11 +188,11 @@ preds           <- predict(res, combat.edata, type='class')
 rownames(preds) <- rownames(combat.edata)
 
 ## Write predictions to file (dog only)
-write.table( preds[rownames(dat.dog),,drop=FALSE], sep=',', col.names=FALSE, row.names=TRUE, quote=FALSE, file='PAM50_dog.csv')
+write.table( preds[rownames(dat.dog),,drop=FALSE], sep=',', col.names=FALSE, row.names=TRUE, quote=FALSE, file=paste(fn.out,'PAM50_dog.csv',sep='/'))
 
 ## Barplots of the predictions - not used in manuscript
 print('User-check barplots');flush.console()
-pdf('PAM50_barplots.pdf')
+pdf(paste(fn.out,'PAM50_barplots.pdf',sep='/'))
 barplot(table(preds[rownames(pam50.labs),1], pam50.labs[,1]), legend=TRUE, col=cols) # Human sample predictions
 barplot( table(preds[rownames(combat.edata) %in% rownames(dog.clin),1], dog.clin$Hist ), legend=TRUE, col=cols ) # Dog sample predictions
 dev.off()
@@ -224,12 +229,12 @@ tbl.preds <- table(preds)
 rowsep.nums <- c( sum(tbl.preds[1]), sum(tbl.preds[1:2]), sum(tbl.preds[1:3]), sum(tbl.preds[1:4]) )
 
 # Heatmap with PAM50 Subtype color bar
-pdf('PAM50_combined_heatmap_subtypes_bar.pdf',width=8,height=20) 
+pdf(paste(fn.out,'PAM50_combined_heatmap_subtypes_bar.pdf',sep='/'),width=8,height=20) 
 heatmap.2(combat.edata[names(sort(preds[,1])),], trace='none', col=colorRampPalette(c('blue','blue','grey20','yellow','yellow')), RowSideColors=preds.cols[names(sort(preds[,1])),1], dendrogram='column', ColSideColors=genes.cols, Rowv='none', rowsep=rowsep.nums, sepcolor='grey60')
 dev.off()
  
 # Heatmap with species color bar
-pdf('PAM50_combined_species_bar.pdf',width=8,height=20)
+pdf(paste(fn.out,'PAM50_combined_species_bar.pdf',sep='/'),width=8,height=20)
 heatmap.2(combat.edata[names(sort(preds[,1])),], trace='none', col=colorRampPalette(c('blue','blue','grey20','yellow','yellow')), RowSideColors=preds.cols[names(sort(preds[,1])),2], dendrogram='column', ColSideColors=genes.cols, Rowv='none', rowsep=rowsep.nums, sepcolor='grey60')
 dev.off()
 
