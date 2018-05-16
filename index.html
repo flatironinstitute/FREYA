@@ -31,8 +31,6 @@
         <p class="lead font-weight-normal"><b>FR</b>amework for <b>E</b>xpression anal<b>Y</b>sis <b>A</b>cross species</p>
         <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA"><img class="mr-3" src="./GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
       </div>
-<!--      <div class="product-device box-shadow d-none d-md-block"></div> 
-      <div class="product-device product-device-2 box-shadow d-none d-md-block"></div>  -->
     </div>
 
 <!-- INTRODUCTION -->
@@ -77,7 +75,7 @@
           </p>
           <p class="lead font-weight-normal">
            This pipeline has several dependencies, which are, in effect, described by the Dockerfile. 
-           The central script is “cmwf_csv.sh.” 
+           The central script is "<tt>cmwf_csv.sh</tt>."
            Please see our GitHub documentation for more information. 
            Mutations are called using <a href="https:// software.broadinstitute.org/gatk/documentation/ article.php?id=3891">GATK Best Practices workflow for SNP and indel calling on RNAseq data</a>.
           </p>
@@ -88,9 +86,9 @@
          <br>
          <h4 class='text-left'>Required Input: </h4>
          <ul class='text-left'>
-         <li>High throughput sequencing (.fastq) files for each sample</li>
+         <li>High throughput sequencing (<tt>.fastq</tt>) files for each sample</li>
          <li>Comma-separated phenotype file containing sample information: histology, sample ID, and patient. Multiple samples per patient are required. </li>
-         <li>Reference genome files (.gtf, .gff  etc)</li>
+         <li>Reference genome files (<tt>.gtf</tt>, <tt>.gff</tt>,  etc)</li>
          </ul>
          <h4 class='text-left'>Dependencies:</h4>
          <ul class='text-left'>
@@ -150,11 +148,11 @@
          <ul class='text-left'>
          <li>Expression matrix file</li>
          <li>Comma-separated phenotype file containing sample information: histology, sample ID, patient ID.</li>
-         <li>In order to use the Docker version of the pipeline, Docker must be installed on your computer</li>
          </ul>
          <h4 class='text-left'>Dependencies:</h4>
          <ul class='text-left'>
          <li>R</li>
+         <li>Docker (if using Docker version of the pipeline)</li>
          </ul>
 <!-- TODO: Add links for install for all the dependencies -->
          <h4 class='text-left'>Steps:</h4>
@@ -179,8 +177,8 @@
          <h4 class='text-left'>Running Using Make</h4>
          <ol class="text-left">
          <li>Set up the repository and a folder containing your sample data. </li>
-         <li>Update the variables at the top of the Makefile to point to your data, then run ‘make clean all’. </li>
-         <li>If you do not want to regenerate the peps and run data preprocessing, run ‘make report’. </li>
+         <li>Update the variables at the top of the Makefile to point to your data, then run ‘<tt>make clean all</tt>’. </li>
+         <li>If you do not want to regenerate the peps and run data preprocessing, run ‘<tt>make report</tt>’. </li>
          <li>The default output directory is 'results'</li>
          </ol>
         <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA"><img class="mr-3" src="./GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
