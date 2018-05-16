@@ -18,10 +18,10 @@
 
     <nav class="site-header sticky-top py-1">
       <div class="container d-flex flex-column flex-md-row justify-content-between">
-        <a class="py-2 " href="#"><img width="40" src="FREYA_logo.png">FREYA</a>
+        <a class="py-2" href="#"><img width="40" alt="logo" src="FREYA_logo.png">FREYA</a>
         <a class="py-2 d-none d-md-inline-block" href="#DataPrep">DataPrep</a>
         <a class="py-2 d-none d-md-inline-block" href="#DataAnalysis">DataAnalysis</a>
-        <a class="py-2 d-none text-white d-md-inline-block" href="https://github.com/flatironinstitute/FREYA"><img class="mr-3" src="./GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a> 
+        <a class="py-2 d-none text-white d-md-inline-block" href="https://github.com/flatironinstitute/FREYA#readme"><img class="mr-3" alt="github" src="GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a> 
       </div>
     </nav>
 
@@ -29,7 +29,7 @@
       <div class="col-md-5 p-lg-5 mx-auto my-5">
         <h1 class="display-1 font-weight-normal">FREYA</h1>
         <p class="lead font-weight-normal"><b>FR</b>amework for <b>E</b>xpression anal<b>Y</b>sis <b>A</b>cross species</p>
-        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA"><img class="mr-3" src="./GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
+        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA#readme"><img class="mr-3" alt="github" src="GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
       </div>
     </div>
 
@@ -39,10 +39,11 @@
         <div class="my-3 p-3">
           <h2 class="display-5">FREYA Framework</h2>
           <p class="lead">A computational pipeline for cross-species cancer analyses</p> <!-- TODO image map for the links in the image -->
-        <div class="media"><img class="mr-3" src="Figure1_Pipeline.png" alt="FREYA Framework"></div></div>
+          <div class="media"><img class="mr-3" src="Figure1_Pipeline.png" alt="FREYA Framework"></div>
+        </div>
           <p class="lead font-weight-normal">
-           The FREYA analytic framework calculates genetic diversity within a cancer cohort, extracts progression-related patterns of expression, calls functional variants, identifies intrinsic human molecular tumor subtypes, and compares them to human breast cancer biology.
-           It helps streamline future canine mammary tumor (or other tissue/species) analyses and provides a comprehensive suite of tools that encompass conventional human analyses and new dog-centric approaches, seamlessly integrating the two.
+            The FREYA analytic framework calculates genetic diversity within a cancer cohort, extracts progression-related patterns of expression, calls functional variants, identifies intrinsic human molecular tumor subtypes, and compares them to human breast cancer biology.
+            It helps streamline future canine mammary tumor (or other tissue/species) analyses and provides a comprehensive suite of tools that encompass conventional human analyses and new dog-centric approaches, seamlessly integrating the two.
           </p>
           <br>
           <p class="lead font-weight-normal">
@@ -52,10 +53,9 @@
             Both DataPrep and DataAnalysis are designed to run with user-provided data. 
             The pipeline requires that each patient (e.g. each dog) has at least 1 sample of each histology: normal, benign, and malignant. 
           </p>
-        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA"><img class="mr-3" src="./GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
+        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA#readme"><img class="mr-3" alt="github" src="GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
         <br>
         <br>
-        </div>
       </div>
     </div>
 
@@ -75,9 +75,9 @@
           </p>
           <p class="lead font-weight-normal">
            This pipeline has several dependencies, which are, in effect, described by the Dockerfile. 
-           The central script is "<tt>cmwf_csv.sh</tt>."
+           The central script is "<kbd>cmwf_csv.sh</kbd>."
            Please see our GitHub documentation for more information. 
-           Mutations are called using <a href="https:// software.broadinstitute.org/gatk/documentation/ article.php?id=3891">GATK Best Practices workflow for SNP and indel calling on RNAseq data</a>.
+           Mutations are called using <a href="https://software.broadinstitute.org/gatk/documentation/article.php?id=3891">GATK Best Practices workflow for SNP and indel calling on RNAseq data</a>.
           </p>
 <!-- TODO: Add links for install for all the dependencies -->
          <br>
@@ -86,9 +86,9 @@
          <br>
          <h4 class='text-left'>Required Input: </h4>
          <ul class='text-left'>
-         <li>High throughput sequencing (<tt>.fastq</tt>) files for each sample</li>
+         <li>High throughput sequencing (<kbd>.fastq</kbd>) files for each sample</li>
          <li>Comma-separated phenotype file containing sample information: histology, sample ID, and patient. Multiple samples per patient are required. </li>
-         <li>Reference genome files (<tt>.gtf</tt>, <tt>.gff</tt>,  etc)</li>
+         <li>Reference genome files (<kbd>.gtf</kbd>, <kbd>.gff</kbd>,  etc)</li>
          </ul>
          <h4 class='text-left'>Dependencies:</h4>
          <ul class='text-left'>
@@ -97,23 +97,23 @@
          </ul>
          <h4 class='text-left'>Steps:</h4>
          <ul class='text-left'>
-         <li>Generate RNA-Seq counts</li>
+         <li>Generate RNA-Seq counts
            <ul class='text-left'>
            <li>Align to the reference genome </li>
            <li>Generate quality reports</li>
            <li>Construct exon counts</li>
            <li>Mark duplicate reads</li>
            <li>Reassign mapping quality scores</li>
-           </ul>
-         <li>Call variants, annotate to genes, create genes-by-samples mutation files</li>
+           </ul></li>
+         <li>Call variants, annotate to genes, create genes-by-samples mutation files
            <ul class='text-left'>
            <li>Call SNPs and indels</li>
            <li>Variant filtration</li>
            <li>Add gene name annotations</li>
            <li>Select final mutation calls</li>
-           </ul>
+           </ul></li>
          </ul>
-        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA"><img class="mr-3" src="./GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
+        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA#readme"><img class="mr-3" alt="github" src="GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
         <br>
         <br>
         <br>
@@ -177,11 +177,11 @@
          <h4 class='text-left'>Running Using Make</h4>
          <ol class="text-left">
          <li>Set up the repository and a folder containing your sample data. </li>
-         <li>Update the variables at the top of the Makefile to point to your data, then run ‘<tt>make clean all</tt>’. </li>
-         <li>If you do not want to regenerate the peps and run data preprocessing, run ‘<tt>make report</tt>’. </li>
+         <li>Update the variables at the top of the Makefile to point to your data, then run "<kbd>make clean all</kbd>".</li>
+         <li>If you do not want to regenerate the peps and run data preprocessing, run "<kbd>make report</kbd>". </li>
          <li>The default output directory is 'results'</li>
          </ol>
-        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA"><img class="mr-3" src="./GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
+        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA#readme"><img class="mr-3" alt="github" src="GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
         <br>
         <br>
         <br>
@@ -193,7 +193,7 @@
 
 <!-- footer -->
     <footer class="container py-5">
-    <div class="text-center"><a><img width="32" src="./FL_Icon.png"></a></div>
+    <div class="text-center"><a><img width="32" alt="Flatiron Institute" src="FL_Icon.png"></a></div>
     </footer>
 
 
