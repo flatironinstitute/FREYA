@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>FREYA</title>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="product.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <nav class="site-header sticky-top py-1">
+      <div class="container d-flex flex-column flex-md-row justify-content-between">
+        <a class="py-2 " href="#"><img width="40" src="FREYA_logo.png">FREYA</a>
+        <a class="py-2 d-none d-md-inline-block" href="#DataPrep">DataPrep</a>
+        <a class="py-2 d-none d-md-inline-block" href="#DataAnalysis">DataAnalysis</a>
+        <a class="py-2 d-none text-white d-md-inline-block" href="https://github.com/flatironinstitute/FREYA"><img class="mr-3" src="./GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a> 
+      </div>
+    </nav>
+
+    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
+      <div class="col-md-5 p-lg-5 mx-auto my-5">
+        <h1 class="display-1 font-weight-normal">FREYA</h1>
+        <p class="lead font-weight-normal"><b>FR</b>amework for <b>E</b>xpression anal<b>Y</b>sis <b>A</b>cross species</p>
+        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA"><img class="mr-3" src="./GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
+      </div>
+<!--      <div class="product-device box-shadow d-none d-md-block"></div> 
+      <div class="product-device product-device-2 box-shadow d-none d-md-block"></div>  -->
+    </div>
+
+<!-- INTRODUCTION -->
+    <div class="d-md-flex flex-md-equal w-100 my-md-3 pl-md-3">
+      <div class="bg-light mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+        <div class="my-3 p-3">
+          <h2 class="display-5">FREYA Framework</h2>
+          <p class="lead">A computational pipeline for cross-species cancer analyses</p> <!-- TODO image map for the links in the image -->
+        <div class="media"><img class="mr-3" src="Figure1_Pipeline.png" alt="FREYA Framework"></div></div>
+          <p class="lead font-weight-normal">
+           The FREYA analytic framework calculates genetic diversity within a cancer cohort, extracts progression-related patterns of expression, calls functional variants, identifies intrinsic human molecular tumor subtypes, and compares them to human breast cancer biology.
+           It helps streamline future canine mammary tumor (or other tissue/species) analyses and provides a comprehensive suite of tools that encompass conventional human analyses and new dog-centric approaches, seamlessly integrating the two.
+          </p>
+          <br>
+          <p class="lead font-weight-normal">
+            FREYA is split into two major components: data preparation <b>(DataPrep)</b> and analysis <b>(DataAnalysis)</b>. 
+            DataPrep prepares sequencing data for analysis. 
+            DataAnalysis runs statistical analyses from the manuscript.
+            Both DataPrep and DataAnalysis are designed to run with user-provided data. 
+            The pipeline requires that each patient (e.g. each dog) has at least 1 sample of each histology: normal, benign, and malignant. 
+          </p>
+        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA"><img class="mr-3" src="./GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
+        <br>
+        <br>
+        </div>
+      </div>
+    </div>
+
+<!-- DATAPREP -->
+    <div class="d-md-flex flex-md-equal w-100 my-md-3 pl-md-3" id="DataPrep">
+      <div class="bg-light mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+        <div class="my-3 p-3">
+          <h1 class="display-5">Preparing the Data </h1>
+          <p class="lead">( DataPrep )</p>
+        </div>
+        <div class="bg-white box-shadow mx-auto" style="width: 80%; border-radius: 21px 21px 21px 21px;">
+          <p class="lead font-weight-normal">
+           DataPrep is the first sub-pipeline of FREYA. 
+           It will prepare processed expression and mutation call data, using the raw data downloaded from your sequencer.
+           DataPrep runtime is highly dependent on the machine used. 
+           For example, the dataset used in the CMT manuscript takes approximately 1 month to process using 1 cpu but can be run in less than 24 hours using the DisBatch setup.
+          </p>
+          <p class="lead font-weight-normal">
+           This pipeline has several dependencies, which are, in effect, described by the Dockerfile. 
+           The central script is “cmwf_csv.sh.” 
+           Please see our GitHub documentation for more information. 
+           Mutations are called using <a href="https:// software.broadinstitute.org/gatk/documentation/ article.php?id=3891">GATK Best Practices workflow for SNP and indel calling on RNAseq data</a>.
+          </p>
+<!-- TODO: Add links for install for all the dependencies -->
+         <br>
+         <br>
+         <h3> Workflow Steps and Environment Requirements </h3>
+         <br>
+         <h4 class='text-left'>Required Input: </h4>
+         <ul class='text-left'>
+         <li>High throughput sequencing (.fastq) files for each sample</li>
+         <li>Comma-separated phenotype file containing sample information: histology, sample ID, and patient. Multiple samples per patient are required. </li>
+         <li>Reference genome files (.gtf, .gff  etc)</li>
+         </ul>
+         <h4 class='text-left'>Dependencies:</h4>
+         <ul class='text-left'>
+         <li>Python, Java, fastQC, DEXSeq, Samtools</li>
+         <li>JAR files: GATK, Picard, SnpEff</li>
+         </ul>
+         <h4 class='text-left'>Steps:</h4>
+         <ul class='text-left'>
+         <li>Generate RNA-Seq counts</li>
+           <ul class='text-left'>
+           <li>Align to the reference genome </li>
+           <li>Generate quality reports</li>
+           <li>Construct exon counts</li>
+           <li>Mark duplicate reads</li>
+           <li>Reassign mapping quality scores</li>
+           </ul>
+         <li>Call variants, annotate to genes, create genes-by-samples mutation files</li>
+           <ul class='text-left'>
+           <li>Call SNPs and indels</li>
+           <li>Variant filtration</li>
+           <li>Add gene name annotations</li>
+           <li>Select final mutation calls</li>
+           </ul>
+         </ul>
+        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA"><img class="mr-3" src="./GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
+        <br>
+        <br>
+        <br>
+        </div>
+        <br>
+      </div>
+    </div>
+
+<!-- DATAANALYSIS -->
+    <div class="d-md-flex flex-md-equal w-100 my-md-3 pl-md-3" id="DataAnalysis">
+      <div class="bg-light mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+        <div class="my-3 p-3">
+          <h1 class="display-5">Analyzing the Data </h1>
+          <p class="lead">( DataAnalysis )</p>
+        </div>
+        <div class="bg-white box-shadow mx-auto" style="width: 80%; border-radius: 21px 21px 21px 21px;">
+          <p class="lead font-weight-normal text-left">
+           This second sub-pipeline depends on processed genomic and phenotype data (created either by yourself or by using FREYA DataPrep).
+           If you used DataPrep, be sure to first run the prep_data.R script to convert the gene names etc.
+           If you are providing pre-processed data you may be able to skip this step (see below).
+           </p><p class="lead font-weight-normal text-left">
+           FREYA DataAnalysis can be run from your browser using either Docker and the Jupiter notebooks, or on the command line by using the provided Makefile.
+           Update the variables in the Jupyter notebook, following the order in Index.ipynb, or in the Makefile, to reflect your data files.
+           We provide some example simulated data in the synthetic_data folder.
+           If you want to view or run the pipeline without using your own data, you can do so by clicking <a href="https://mybinder.org/v2/gh/flatironinstitute/FREYA/master">Launch Binder</a> (also in the Github repository).
+          </p>
+         <br>
+         <br>
+         <h3> Workflow Steps and Environment Requirements </h3>
+         <br>
+         <h4 class='text-left'>Required Input: </h4>
+         <ul class='text-left'>
+         <li>Expression matrix file</li>
+         <li>Comma-separated phenotype file containing sample information: histology, sample ID, patient ID.</li>
+         <li>In order to use the Docker version of the pipeline, Docker must be installed on your computer</li>
+         </ul>
+         <h4 class='text-left'>Dependencies:</h4>
+         <ul class='text-left'>
+         <li>R</li>
+         </ul>
+<!-- TODO: Add links for install for all the dependencies -->
+         <h4 class='text-left'>Steps:</h4>
+         <ul class='text-left'>
+          <li>Prep the data - This preprocessing script creates the input files for the rest of the analysis scripts (except CMT_PEPs.csv).  </li>
+          <li>Generate PEPS, run histology simulations - Generates new PEP lists based on the user data. </li>
+          <li>Gene Ontology enrichment - runs GO enrichment using topGO. This requires a file with PEP enrichment scores. </li> 
+          <li>PAGE enrichment - Calculates PAGE enrichment for a number of comparisons in the human data, using PEP lists from the canine data.  </li>
+          <li>Differential Expression Analysis - Compares differential expression in human tumor/normal samples against the PEP genes from dog. </li>
+          <li>PAM50 Subtype Analysis - Predicts PAM50 subtypes for the user data, based on TCGA BRCA RNA-Seq data. </li>
+          <li>Mutation Analysis - Runs all mutations analysis on the user data. </li>
+         </ul>
+        <br>
+         <h3 class='text-left'> Running the DataAnalysis Workflow </h3>
+         <h4 class='text-left'>Running Using the Docker image</h4>
+         <h5 class='text-left'>Setting up the Docker image</h5>
+          <div class="media"><img class="mx-auto" style="width: 90%;" src="FREYA_SetUpDataAnalysis.png" alt="Setting up the Docker image"></div>
+          <br>
+         <h5 class='text-left'>How it appears in your browser</h5>
+          <div class="media"><img class="mx-auto" style="width: 90%;" src="FREYA_AppearanceDataAnalysis.png" alt="Setting up the Docker image"></div>
+          <br>
+         <h4 class='text-left'>Running Using Make</h4>
+         <ol class="text-left">
+         <li>Set up the repository and a folder containing your sample data. </li>
+         <li>Update the variables at the top of the Makefile to point to your data, then run ‘make clean all’. </li>
+         <li>If you do not want to regenerate the peps and run data preprocessing, run ‘make report’. </li>
+         <li>The default output directory is 'results'</li>
+         </ol>
+        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/flatironinstitute/FREYA"><img class="mr-3" src="./GitHub-Mark/PNG/GitHub-Mark-32px.png">Install FREYA</a>
+        <br>
+        <br>
+        <br>
+        </div>
+        <br>
+      </div>
+    </div>
+
+
+<!-- footer -->
+    <footer class="container py-5">
+    <div class="text-center"><a><img width="32" src="./FL_Icon.png"></a></div>
+    </footer>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+
+  </body>
+</html>
