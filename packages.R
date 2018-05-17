@@ -75,3 +75,6 @@ if(!require('devtools')) {
   install.packages('devtools')
   library(devtools)
 }
+if(!require('org.Hs.eg.db')) {
+  biocLite("org.Hs.eg.db")
+}

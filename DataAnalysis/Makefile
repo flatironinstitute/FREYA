@@ -1,6 +1,3 @@
-## THIS IS UNTESTED
-## Eventually should commit to the repo
-
 ## Set your variable names
 
 ## Folders for use
@@ -30,7 +27,7 @@ BRCAPHEN=$(DATADIR)/BRCA_PAM50_labels.csv
 dat:
 	echo 'Running the data processing scripts'
 	$(REPODIR)/prep_data.R -d $(USERDIR)
-	$(REPODIR)/peps_and_simulations.R -s $(DOGPHEN) -i 10 -d $(USERDIR) -c $(USERDIR)/dexseq_count -m $(MAPPING)
+	$(REPODIR)/peps_and_simulations.R -s $(DOGPHEN) -i 10 -d $(USERDIR) -c $(USERDIR)/dexseq_count -m $(MAPPING) # TODO: change from 10 to 300 iterations
 	rm -f Rplots.pdf
 
 ## Runs manuscript analysis

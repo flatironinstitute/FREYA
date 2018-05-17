@@ -24,7 +24,6 @@ library(devtools)
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, prompt = FALSE)
 
 ## Read in Count Data
-#samplesCanine <- read.csv('samples_canine_updated.csv')
 samplesCanine <- read.csv(opt$samplesCanine)
 counts <- readDGE(samplesCanine$File, paste0(opt$countdir,'/'), header = FALSE)
 minCount <- round((nrow(samplesCanine)/length(levels(samplesCanine$Hist))), 0)

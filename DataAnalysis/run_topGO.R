@@ -158,6 +158,35 @@ pep.names <- c('Tumor_Expression_Pattern', 'Carcinoma_Expression_Pattern', 'Aden
 go.res <- lapply(pep.names, function(x){ run_topGO(peps,pep.name=x) }) 
 names(go.res) <- pep.names
 
+## Run topGO on BRCA (scores generated in DESeq3.R, also provided in the repository)
+print('Running the BRCA comparisons'); flush.console()
+de.brca <- read.table('data/BRCA_sig_genes.csv', sep=',', header=T, row.names=1, check.names=F) # TODO: Don't hardcode filename???
+
+geneUniverse <- de.brca[,'AbsLog10FoldChange' ]
+names(geneUniverse) <- rownames(de.brca)
+
+geneID2GO = getgo(rownames(de.brca), genome='hg19', 'geneSymbol')
+topDiffGenes <- function(allScore) { return(allScore < 0.5) } 
+desiredOntology <- 'BP'
+
+topGOdata <- new('topGOdata',
+  description = paste('BRCA',desiredOntology),
+  ontology = desiredOntology,
+  allGenes = geneUniverse,
+  geneSel = topDiffGenes,
+  annot = annFUN.gene2GO,
+  gene2GO = geneID2GO,
+  nodeSize = opt$num)
+
+resultKS     <- runTest(topGOdata, algorithm = 'weight01', statistic = 'ks') 
+brca.go.res     <-GenTable(topGOdata,pvalue=resultKS,topNodes=length(resultKS@score))
+brca.go.res$FDR <-p.adjust(brca.go.res$pvalue,method='BH')
+brca.go.res     <- brca.go.res[brca.go.res$pvalue<0.05,]
+brca.go.res <- brca.go.res[ brca.go.res$Significant > brca.go.res$Expected,]
+brca.go.res$Genes <- sapply(brca.go.res$GO.ID, function(x) { paste(unlist(genesInTerm(topGOdata, x)), collapse=',') } )
+
+#write.table(brca.go.res, file='BRCA_GO_res.csv', sep=',', col.names=TRUE, row.names=TRUE, quote=TRUE) # TODO temp print statement
+ 
 ### Run topGO using each histology contrast m_n from LRTtidied
 ## Load the profile metrics
 if( !is.null(opt$two) ) {
@@ -165,20 +194,12 @@ if( !is.null(opt$two) ) {
 
   ## Check to make sure the required rda files exist, if yes then load them & run analysis
   ## Make sure all of the required files exist - quit if any are missing
-  #rda <- paste(opt$datadir,'humanmapping.rda', sep='/') # TODO: what if the user gens their own? should use that it they do
   rda <- opt$humap
   if(!file.exists(rda)) { print(paste('ERROR: Unable to locate',rda, sep='/')); quit(save='no',status=1) }
   load(rda)
-#  rda <- paste(opt$datadir,'LRTtidied.rda', sep='/') # TODO: this is wrong... should have location of these files given as arg
   rda <- opt$lrt
   if(!file.exists(rda)) { print(paste('ERROR: Unable to locate',rda, sep='/')); quit(save='no',status=1) }
   load(rda)
-
-#  for( rda in c('LRTtidied.rda','humanmapping.rda') ) {
-#    rda <- paste(opt$datadir,rda, sep='/')
-#    if(!file.exists(rda)) { print(paste('ERROR: Unable to locate',paste(opt$datadir,rda, sep='/'))); quit(save='no',status=1) }
-#    load(rda)
-#  }
 
   ## Add human mappings
   LRTtidied$HumanSymbol <- NA #Not all map to human
@@ -211,15 +232,18 @@ print('Generating the supplemental table with results.'); flush.console()
 go.res$Adenoma_Expression_Pattern   <- go.res$Adenoma_Expression_Pattern[,c('GO.ID','Term','pvalue','Genes')]
 go.res$Carcinoma_Expression_Pattern <- go.res$Carcinoma_Expression_Pattern[,c('GO.ID','Term','pvalue','Genes')]
 go.res$Tumor_Expression_Pattern     <- go.res$Tumor_Expression_Pattern[,c('GO.ID','Term','pvalue','Genes')]
+brca.go.res                         <- brca.go.res[,c('GO.ID','Term','pvalue')]
 
 ## Change to unique column names
 colnames(go.res$Adenoma_Expression_Pattern)   <- c('GO.ID','Term','PValueEnrich_in_Adenoma_Expression_Pattern','SigGenes_Adenoma_PEP')
 colnames(go.res$Carcinoma_Expression_Pattern) <- c('GO.ID','Term','PValueEnrich_in_Carcinoma_Expression_Pattern','SigGenes_Carcinoma_PEP')
 colnames(go.res$Tumor_Expression_Pattern)     <- c('GO.ID','Term','PValueEnrich_in_Tumor_Expression_Pattern','SigGenes_Tumor_PEP')
+colnames(brca.go.res)                         <- c('GO.ID','Term','PValueEnrich_in_BRCA')
 
 ## Combine the PEP results tables into 1
 res <- full_join(go.res$Tumor_Expression_Pattern, go.res$Carcinoma_Expression_Pattern, by=c('GO.ID','Term'))
 res <- full_join(go.res$Adenoma_Expression_Pattern, res, by=c('GO.ID','Term'))
+res <- left_join(res, brca.go.res, by=c('GO.ID','Term'))
 
 
 ## Add Normal vs Carcinoma comparison if option is set
@@ -228,9 +252,9 @@ if( !is.null(opt$two) ) {
   res.maligVSnormal <- res.maligVSnormal[,c('GO.ID','Term','pvalue')]
   colnames(res.maligVSnormal) <- c('GO.ID','Term','PValueEnrich_in_Normal_vs_Carcinoma')
   res <- full_join(res.maligVSnormal, res, by=c('GO.ID','Term'))
-  res <- res[, c('GO.ID','Term','PValueEnrich_in_Normal_vs_Carcinoma','PValueEnrich_in_Tumor_Expression_Pattern','PValueEnrich_in_Carcinoma_Expression_Pattern','PValueEnrich_in_Adenoma_Expression_Pattern','SigGenes_Tumor_PEP','SigGenes_Carcinoma_PEP','SigGenes_Adenoma_PEP')]   
+  res <- res[, c('GO.ID','Term','PValueEnrich_in_Tumor_Expression_Pattern','PValueEnrich_in_Carcinoma_Expression_Pattern','PValueEnrich_in_Adenoma_Expression_Pattern','PValueEnrich_in_BRCA','PValueEnrich_in_Normal_vs_Carcinoma','SigGenes_Tumor_PEP','SigGenes_Carcinoma_PEP','SigGenes_Adenoma_PEP')]   
 } else {
-  res <- res[, c('GO.ID','Term','PValueEnrich_in_Tumor_Expression_Pattern','PValueEnrich_in_Carcinoma_Expression_Pattern','PValueEnrich_in_Adenoma_Expression_Pattern','SigGenes_Tumor_PEP','SigGenes_Carcinoma_PEP','SigGenes_Adenoma_PEP')]   
+  res <- res[, c('GO.ID','Term','PValueEnrich_in_Tumor_Expression_Pattern','PValueEnrich_in_Carcinoma_Expression_Pattern','PValueEnrich_in_Adenoma_Expression_Pattern','PValueEnrich_in_BRCA','SigGenes_Tumor_PEP','SigGenes_Carcinoma_PEP','SigGenes_Adenoma_PEP')]   
 }
 
 ## NA gene lists to empty string

@@ -130,8 +130,7 @@ pick.2.samples <- function(pat.num) {
 
 ## Load the function to generate PEP lists.
 ##   NOTE: This takes some time to load
-#load(paste(opt$datadir,'humanmapping.rda', sep='/')) #TODO
-load(opt$mapping) # TODO
+load(opt$mapping)
 source('run_genPEPs.R') 
 
 ## Load phenotype data for the dogs

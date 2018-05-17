@@ -172,6 +172,9 @@ ggsave(paste(out.dir,'PEP_BRCA_AbsLogFoldChange.pdf',sep='/'),width=8,height=6)
 
 mean(sig.genes$AbsLog10FoldChange)
 
+## Save the scores for the topGO script
+write.table(sig.genes, file=paste(out.dir,'BRCA_sig_genes.csv',sep='/'), sep=',', col.names=TRUE, row.names=TRUE, quote=FALSE)
+
 print('Wilcoxon text absolute log10 fold change of each PEP'); flush.console()
 print(wilcox.test(AbsLog10FoldChange ~ PEP=='Adenoma', data = peps)); flush.console()
 print(wilcox.test(AbsLog10FoldChange ~ PEP=='Carcinoma', data = peps)); flush.console()
@@ -203,7 +206,8 @@ write.table(diff.eq[diff.eq$PEP!='nonPEP',], file=paste(out.dir,'PEP_Roles_in_Ca
 
 ## Plot & save
 pdf(paste(out.dir,"PEP_Roles_in_Cancer_Barplot.pdf",sep='/'))
-barplot(tbl, legend=TRUE, ylim=c(0,max(apply(tbl,2,sum))+8), col=cols[c(4,5,7)]) # Add vertical space for legend
+#barplot(tbl, legend=TRUE, ylim=c(0,max(apply(tbl,2,sum))+8), col=cols[c(4,5,7)]) # Add vertical space for legend
+barplot(tbl, legend=TRUE, ylim=c(0,max(apply(tbl,2,sum))+8), col=cols) # Add vertical space for legend
 dev.off()
 
 print('Success!')
