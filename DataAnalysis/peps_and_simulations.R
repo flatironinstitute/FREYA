@@ -26,6 +26,10 @@ if(!require('getopt')) {
   install.packages('getopt')
   library(getopt)
 }
+if(!require('gplots')) {
+  install.packages('gplots')
+  library(gplots)
+}
 
 ## usage, options and doc 
 argspec <- paste(get_Rscript_filename(), c(paste('Generates PEP lists and runs simulation tests.
@@ -154,7 +158,6 @@ print('Full PEP lengths:'); flush.console()
 print(sapply(peps, length)); flush.console() # Print num genes in each PEP 
 write.table(peps.real, file=paste(opt$outdir,'CMT_PEPs.csv',sep='/'), sep=',', col.names=TRUE, row.names=FALSE, quote=FALSE)
 
-
 ## Run simulations using subsets of the data -- 2 versions of simulations will be run
 
 ## first approach: a total of 30 samples from 10 patients (each with at least one normal, adenoma, and carcinoma sample) are selected at random.
@@ -226,5 +229,79 @@ print('Generating simulations correlation plot.'); flush.console()
 tmp <- melt( rbind(peps.cor.2hist, peps.cor.3hist) )
 ggplot(tmp) + geom_boxplot((aes(x=variable,y=value,fill=Hist))) + coord_flip() + scale_fill_manual(values=sample(cols,2)) + ylab('Spearman Correlation to true PEPs') + xlab('') + theme_bw(base_size = 18) 
 ggsave(paste(opt$outdir,'PEP_hist_simulations.pdf',sep='/'), width=8,height=4) 
+
+### Create heatmap for manuscript figure, showing the PEPs
+#  Sort by Normal-Adenoma-Carcinoma, column-wise
+#  Separate panes for each PEP, ordered into the high vs low expression
+dat <- read.table(paste(opt$outdir,'Canine_RNASeq.csv',sep='/'),sep=',', header=TRUE, row.names=1, check.names=FALSE) # TODO
+
+print('Loading data'); flush.console()
+#save.image(file='peps.RData') #TODO TEMP
+
+library(RColorBrewer)
+#cols.hist <- c('#7DD1B9','#EBDA8C','#965354')
+names(cols.hist) <- c('M','B','N')
+cols.heat <- colorRampPalette(c('blue','blue','grey20','yellow','yellow'))
+
+print('Colors set'); flush.console()
+
+## Generate sample order so is sorted by Histology
+ids   <- c( as.character(dat.hist[dat.hist$Hist=='N','Qlabel']), as.character(dat.hist[dat.hist$Hist=='B','Qlabel']), as.character(dat.hist[dat.hist$Hist=='M','Qlabel']) )
+
+## Generate the heatmaps (one for each PEP, need to keep same sample order for later groupings)
+
+## Print the PEP high vs low counts per PEP list
+## Calculate median expression in tumor vs normal
+
+## This set would calculate tumor vs normal avg expression
+#med.tumor  <- apply(dat[dat.hist$Hist %in% c('B','M'),], 2, median)
+#med.normal <- apply(dat[dat.hist$Hist %in% c('N'),], 2, median)
+#tum.norm <- med.tumor-med.normal
+#print( paste('Greater',sum(tum.norm>0)) )
+#print( paste('Lesser',sum(tum.norm<0)) )
+
+## Sizes for plots based on PEP sizes
+hm.sz.inches <- 12 # Total desired size of all plots
+hm.sz <- sum(sapply(peps, length))
+hm.sz.c <- hm.sz.inches * 10 * (length(peps$Carcinoma)/hm.sz)
+hm.sz.t <- hm.sz.inches * 10 * (length(peps$Tumor)/hm.sz)
+hm.sz.a <- hm.sz.inches * 10 * (length(peps$Adenoma)/hm.sz)
+
+## Carcinoma 
+print('Carcinoma');flush.console()
+med.tumor  <- apply(dat[dat.hist$Hist %in% c('B','M'),peps$Carcinoma], 2, median)
+med.normal <- apply(dat[dat.hist$Hist %in% c('N'),peps$Carcinoma], 2, median)
+tum.norm <- med.tumor-med.normal
+print( paste('Greater',sum(tum.norm>0)) );flush.console()
+print( paste('Lesser',sum(tum.norm<0)) );flush.console()
+
+pdf(paste(opt$outdir,'CarcinomaPEP_Heatmap.pdf',sep='/'), width=8, height=hm.sz.c)
+heatmap.2(t(dat[ids,peps$Carcinoma]), col=cols.heat, dendrogram='none', trace='none', ColSideColors=cols.hist[dat.hist[ids,'Hist']], Colv=FALSE, key=FALSE)
+dev.off()
+
+## Tumor 
+print('Tumor');flush.console()
+med.tumor  <- apply(dat[dat.hist$Hist %in% c('B','M'),peps$Tumor], 2, median)
+med.normal <- apply(dat[dat.hist$Hist %in% c('N'),peps$Tumor], 2, median)
+tum.norm <- med.tumor-med.normal
+print( paste('Greater',sum(tum.norm>0)) );flush.console()
+print( paste('Lesser',sum(tum.norm<0)) );flush.console()
+
+pdf(paste(opt$outdir,'TumorPEP_Heatmap.pdf',sep='/'), width=8, height=hm.sz.t)
+heatmap.2(t(dat[ids,peps$Tumor]), col=cols.heat, dendrogram='none', trace='none', ColSideColors=cols.hist[dat.hist[ids,'Hist']], Colv=FALSE, key=FALSE)
+dev.off()
+
+## Adenoma
+print('Adenoma');flush.console()
+med.tumor  <- apply(dat[dat.hist$Hist %in% c('B','M'),peps$Adenoma], 2, median)
+med.normal <- apply(dat[dat.hist$Hist %in% c('N'),peps$Adenoma], 2, median)
+tum.norm <- med.tumor-med.normal
+print( paste('Greater',sum(tum.norm>0)) );flush.console()
+print( paste('Lesser',sum(tum.norm<0)) );flush.console()
+
+pdf(paste(opt$outdir,'AdenomaPEP_Heatmap.pdf',sep='/'), width=8, height=hm.sz.a)
+heatmap.2(t(dat[ids,peps$Adenoma]), col=cols.heat, dendrogram='none', trace='none', ColSideColors=cols.hist[dat.hist[ids,'Hist']], Colv=FALSE, key=FALSE)
+dev.off()
+
 
 print('Finished! Success!'); flush.console()

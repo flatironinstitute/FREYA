@@ -89,14 +89,21 @@ run_topGO <- function(peps, pep.name, alg='weight01', ns=opt$num) {
 
   ## Whole gene list
   geneUniverse <- peps[, pep.name]
-  names(geneUniverse) <- peps$HumanSymbol
+  # In case it's a two-hist comparison, check the column name
+  if( 'EnsGene' %in% colnames(peps) ) {
+    names(geneUniverse) <- peps$EnsGene
+ #   names(geneUniverse) <- peps$HumanSymbol # old
+  } else if ( 'gene' %in% colnames(peps) ) {
+        names(geneUniverse) <- peps$gene
+  }
 
   ## Load the GO annotations to use
   if( !is.null(opt$mapping) ) {
     geneID2GO <- try(readMappings(file=opt$mapping))
     if(inherits(geneID2GO, "try-error")) { print('ERROR: Unable to read mapping file.'); quit(save='no',status=1) }
   } else {
-    geneID2GO = getgo(peps$HumanSymbol, genome='hg19', 'geneSymbol')
+    #geneID2GO = getgo(peps$HumanSymbol, genome='hg19', 'geneSymbol') # old
+    geneID2GO = getgo(names(geneUniverse),genome='canFam3','ensGene')
   } 
 
   ## How we select the genes of interest
@@ -125,7 +132,10 @@ run_topGO <- function(peps, pep.name, alg='weight01', ns=opt$num) {
   dfresult <- dfresult[ dfresult$Significant > dfresult$Expected,]
 
   ## Add list of genes in each set
-  dfresult$Genes <- sapply(dfresult$GO.ID, function(x) { paste(unlist(genesInTerm(topGOdata, x)), collapse=',') } )
+  dfresult$Genes <- sapply(dfresult$GO.ID, function(x) { 
+    paste(peps[peps$EnsGene %in% intersect(peps$EnsGene[ peps[,pep.name]<0.05], genesInTerm(topGOdata, x)[[1]]), 'HumanSymbol'], collapse=',')
+    
+  } )
 
   return( dfresult )
 } # End run_topGO
@@ -160,7 +170,7 @@ names(go.res) <- pep.names
 
 ## Run topGO on BRCA (scores generated in DESeq3.R, also provided in the repository)
 print('Running the BRCA comparisons'); flush.console()
-de.brca <- read.table('data/BRCA_sig_genes.csv', sep=',', header=T, row.names=1, check.names=F) # TODO: Don't hardcode filename???
+de.brca <- read.table('data/BRCA_sig_genes.csv', sep=',', header=T, row.names=1, check.names=F) # This file never changes
 
 geneUniverse <- de.brca[,'AbsLog10FoldChange' ]
 names(geneUniverse) <- rownames(de.brca)
@@ -178,14 +188,14 @@ topGOdata <- new('topGOdata',
   gene2GO = geneID2GO,
   nodeSize = opt$num)
 
-resultKS     <- runTest(topGOdata, algorithm = 'weight01', statistic = 'ks') 
-brca.go.res     <-GenTable(topGOdata,pvalue=resultKS,topNodes=length(resultKS@score))
-brca.go.res$FDR <-p.adjust(brca.go.res$pvalue,method='BH')
-brca.go.res     <- brca.go.res[brca.go.res$pvalue<0.05,]
-brca.go.res <- brca.go.res[ brca.go.res$Significant > brca.go.res$Expected,]
+resultKS          <- runTest(topGOdata, algorithm = 'weight01', statistic = 'ks') 
+brca.go.res       <- GenTable(topGOdata,pvalue=resultKS,topNodes=length(resultKS@score))
+brca.go.res$FDR   <- p.adjust(brca.go.res$pvalue,method='BH')
+brca.go.res       <- brca.go.res[brca.go.res$pvalue<0.05,]
+brca.go.res       <- brca.go.res[ brca.go.res$Significant > brca.go.res$Expected,]
 brca.go.res$Genes <- sapply(brca.go.res$GO.ID, function(x) { paste(unlist(genesInTerm(topGOdata, x)), collapse=',') } )
 
-#write.table(brca.go.res, file='BRCA_GO_res.csv', sep=',', col.names=TRUE, row.names=TRUE, quote=TRUE) # TODO temp print statement
+write.table(brca.go.res, file='BRCA_GO_res.csv', sep=',', col.names=TRUE, row.names=TRUE, quote=TRUE)  # TODO: redirect to output directory
  
 ### Run topGO using each histology contrast m_n from LRTtidied
 ## Load the profile metrics
@@ -204,7 +214,7 @@ if( !is.null(opt$two) ) {
   ## Add human mappings
   LRTtidied$HumanSymbol <- NA #Not all map to human
   LRTtidied$HumanSymbol[ LRTtidied$gene %in% Map_CanEns2HumSymb_unique$Can_Ens ] <- Map_CanEns2HumSymb_unique$Hum_Symb
-  LRTtidied <- LRTtidied[! is.na(LRTtidied$HumanSymbol),]
+#  LRTtidied <- LRTtidied[! is.na(LRTtidied$HumanSymbol),]
 
   # Malignant vs Normal - only print significantly enriched terms (not significantly under-enriched)
   print('Processing: Malignant vs Normal');flush.console()
@@ -273,8 +283,6 @@ res <- res[with(res, order(PValueEnrich_in_Tumor_Expression_Pattern)),]
 
 # Save to file
 write.table(res, file=paste(opt$outdir, 'GO_Enrichment.csv', sep='/'), sep=',', col.names=TRUE, row.names=FALSE, quote=TRUE)
-
-## TODO: Add in the human enrichment analysis based on the BRCA data
 
 ## Wrap it all up
 print(paste('Finished, printing files to:',opt$outdir));flush.console()
