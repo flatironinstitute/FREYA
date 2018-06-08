@@ -1,12 +1,9 @@
 
 [![Binder](http://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/flatironinstitute/FREYA/master)
 
-# FREYA
+# FREYA DataAnalysis
 
-
-This is a public repository for canine breast cancer analysis.
-
-There are two main sub-pipelines in this analysis. The first, in DataPrep, will process raw data to create expression and mutation calls. The second, in notebooks, will take that data (or you can provide your own processed data) and perform a series of analyses, including comparing it to human breast cancer. The rest of this description walks through how the analysis side of the pipeline is set up. 
+This description walks through how the analysis side of the pipeline is set up. 
 
 The repository is designed to use 
 [`repo2docker`](https://repo2docker.readthedocs.io/en/latest/)
@@ -28,7 +25,7 @@ jupyter-repo2docker --no-run \
 The analysis requires source data which is not included
 in the repository to protect privacy and intellectual property.
 The required data must be mounted to the container or provided
-in some other way. We provide synthetic sample data in TODO.
+in some other way. We provide synthetic sample data in `synthetic_data/`.
 
 To run the image with a mounted data directory located at
 `/Path/to/your/data`
@@ -141,12 +138,3 @@ docker image prune
 
 to free up space or search for other similar methods.
 
-## Todo (temp):
-
-Fix notebook errors.
-
-Output artifact (like diagrams) should go into a mounted persistent location.
-
-Make repo public after vetting.
-
-Provide mechanisms for uploading and downloading data that will work in Binder environment.
