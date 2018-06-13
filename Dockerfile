@@ -29,6 +29,11 @@ RUN R -f /home/rstudio/packages.R
 USER root
 RUN chown -R ${NB_UID}:${NB_UID} ${HOME}
 RUN chsh -s /bin/bash ${NB_USER}
+RUN sudo apt-get install python3-pip
+RUN python3 -m pip install jp_proxy_widget
+RUN python3 -m pip install requests
+RUN jupyter nbextension enable --py --sys-prefix jp_proxy_widget
+
 USER ${NB_USER}
 
 # Run install.r if it exists
