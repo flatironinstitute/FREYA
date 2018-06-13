@@ -79,7 +79,12 @@ font-size: large;
 
 .logo {top: 20px; right: 0px; bottom: 0px; left: 4}
 
-.icon { border-top: 10px}
+.icon {
+	border-top: 10px;
+	margin-left: 188px;
+	margin-right: -96px;
+	margin-bottom: 26px;
+}
 /*
  * Extra utilities
  */
@@ -99,7 +104,10 @@ font-size: large;
   }
 }
 
-.overflow-hidden { overflow: hidden; }
+.overflow-hidden {
+	overflow: hidden;
+	margin-top: -44px;
+}
 
 
 .col-md-5 {
