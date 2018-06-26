@@ -4,27 +4,10 @@
 # FREYA
 
 
-This is a public repository for canine breast cancer analysis.
+This is a public repository for FREYA, a computational pipeline for cross-species cancer analyses. 
 
-There are two main sub-pipelines in this analysis. The first, in DataPrep, will process raw data to create expression and mutation calls. The second will take that data (or you can provide your own processed data) and perform a series of analyses, including comparing it to human breast cancer. 
+The FREYA analytic framework calculates genetic diversity within a cancer cohort, extracts progression-related patterns of expression, calls functional variants, identifies intrinsic human molecular tumor subtypes, and compares them to human breast cancer biology. It helps streamline future canine mammary tumor (or other tissue/species) analyses and provides a comprehensive suite of tools that encompass conventional human analyses and new dog-centric approaches, seamlessly integrating the two.
 
-The DataAnalysis part of the repository is designed to use 
-[`repo2docker`](https://repo2docker.readthedocs.io/en/latest/)
-to build a `docker` container which includes
-the code for running the analysis and all needed dependencies.
-The `repo2docker` tool requires the `docker` infrastructure
-and Python 3 to run.  See the 
-[installation instructions](https://repo2docker.readthedocs.io/en/latest/install.html).
+There are two main sub-pipelines in this analysis. The first, DataPrep, processes raw sequencing data to create expression and mutation calls. The second, DataAnalysis, takes that data (or you can provide your own processed data) and performs a series of analyses, including comparisons to human breast cancer.
 
-Directions for running and installing both DataPrep and DataAnalysis are located in their respective folders. 
-
-
-## Todo (temp):
-
-Fix notebook errors.
-
-Output artifact (like diagrams) should go into a mounted persistent location.
-
-Make repo public after vetting.
-
-Provide mechanisms for uploading and downloading data that will work in Binder environment.
+Directions for running and installing [DataPrep](https://github.com/flatironinstitute/FREYA/blob/master/DataPrep/README.md) and [DataAnalysis](https://github.com/flatironinstitute/FREYA/blob/master/DataAnalysis/README.md) are located in their respective folders. There is also an overview of the framework and its requirements at [freya.flatironinstitute.org](http://freya.flatironinstitute.org/). 
