@@ -6,9 +6,17 @@
  * Custom translucent site header
  */
 .background-gradient
-{background-image: url(https://onejohnst.com/wp-content/uploads/day-gradient.png)}
+{
+	background-image: url(https://onejohnst.com/wp-content/uploads/day-gradient.png), -webkit-linear-gradient(270deg,rgba(76,99,168,1.00) 0%,rgba(255,255,255,0.24) 100%);
+	background-image: url(https://onejohnst.com/wp-content/uploads/day-gradient.png), -moz-linear-gradient(270deg,rgba(76,99,168,1.00) 0%,rgba(255,255,255,0.24) 100%);
+	background-image: url(https://onejohnst.com/wp-content/uploads/day-gradient.png), -o-linear-gradient(270deg,rgba(76,99,168,1.00) 0%,rgba(255,255,255,0.24) 100%);
+	background-image: url(https://onejohnst.com/wp-content/uploads/day-gradient.png), linear-gradient(180deg,rgba(76,99,168,1.00) 0%,rgba(255,255,255,0.24) 100%);
+}
 
-.background-color {background-color:aliceblue }
+.background-color {
+	background-color: #F0F8FF;
+	background-image: url(url);
+}
 		
 .site-header {
   -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -118,4 +126,8 @@ font-size: large;
 	
 }
 
-.title {float: right; width: 70%; }
+.title {
+	float: right;
+	width: 70%;
+	top: -55px;
+}
