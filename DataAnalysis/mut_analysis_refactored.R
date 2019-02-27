@@ -159,7 +159,8 @@ print('Generating density plot'); flush.console()
 
 ## Count mutations in each benign & malignant sample, create and save density plot
 samples.freq <- data.frame(Mutations=apply(dat, 2, sum), Hist=dat.hist[colnames(dat),'Hist'])
-ggplot(samples.freq) + geom_density(aes(Mutations,group=Hist,col=Hist),lwd=3) + scale_color_manual(values=cols.hist[2:3]) + theme_bw() + theme(text = element_text(size=20))
+ggplot(samples.freq) + geom_line(stat='density', aes(Mutations,group=Hist,col=Hist),lwd=3) + scale_color_manual(values=cols.hist[2:3]) + theme_bw() + theme(text = element_text(size=20))
+#ggplot(samples.freq) + geom_density(aes(Mutations,group=Hist,col=Hist),lwd=3) + scale_color_manual(values=cols.hist[2:3]) + theme_bw() + theme(text = element_text(size=20))
 ggsave(paste(opt$outdir, 'Sample_Mutation_Counts_Density.pdf',sep='/'),width=12, height=4)
 
 ## Print the median number of mutated genes per histology
