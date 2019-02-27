@@ -11,3 +11,5 @@ The FREYA analytic framework calculates genetic diversity within a cancer cohort
 There are two main sub-pipelines in this analysis. The first, DataPrep, processes raw sequencing data to create expression and mutation calls. The second, DataAnalysis, takes that data (or you can provide your own processed data) and performs a series of analyses, including comparisons to human breast cancer.
 
 Directions for running and installing [DataPrep](https://github.com/flatironinstitute/FREYA/blob/master/DataPrep/README.md) and [DataAnalysis](https://github.com/flatironinstitute/FREYA/blob/master/DataAnalysis/README.md) are located in their respective folders. There is also an overview of the framework and its requirements at [freya.flatironinstitute.org](http://freya.flatironinstitute.org/). 
+
+
