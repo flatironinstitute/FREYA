@@ -7,10 +7,7 @@
  */
 .background-gradient
 {
-	background-image: url(https://onejohnst.com/wp-content/uploads/day-gradient.png), -webkit-linear-gradient(270deg,rgba(76,99,168,1.00) 0%,rgba(255,255,255,0.24) 100%);
-	background-image: url(https://onejohnst.com/wp-content/uploads/day-gradient.png), -moz-linear-gradient(270deg,rgba(76,99,168,1.00) 0%,rgba(255,255,255,0.24) 100%);
-	background-image: url(https://onejohnst.com/wp-content/uploads/day-gradient.png), -o-linear-gradient(270deg,rgba(76,99,168,1.00) 0%,rgba(255,255,255,0.24) 100%);
-	background-image: url(https://onejohnst.com/wp-content/uploads/day-gradient.png), linear-gradient(180deg,rgba(76,99,168,1.00) 0%,rgba(255,255,255,0.24) 100%);
+	background-image: linear-gradient(#5E788E, white);
 }
 
 .background-color {
@@ -44,39 +41,6 @@ font-size: large;
 /*
  * Dummy devices (replace them with your own or something else entirely!)
  */
-
-.product-device {
-  position: absolute;
-	left: 25%
-  right: 10%;
-  bottom: -30%;
-  width: 300px;
-  height: 540px;
-  background-color: #333;
-  border-radius: 21px;
-  -webkit-transform: rotate(30deg);
-  transform: rotate(30deg);
-}
-
-.product-device::before {
-  position: absolute;
-  top: 10%;
-  right: 10px;
-  bottom: 10%;
-  left: 10px;
-  content: "";
-  background-color: rgba(255, 255, 255, .1);
-  border-radius: 5px;
-}
-
-.product-device-2 {
-  top: -25%;
-  right: auto;
-  bottom: 0;
-  left: 5%;
-  background-color: #e5e5e5;
-}
-
 .section-underline {
   width: 133px;
   margin-left: auto;
